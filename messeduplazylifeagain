@@ -1,0 +1,111 @@
+#!/bin/bash
+################################################################
+echo "So you have messed your server again"
+################################################################
+echo -n "this will setup your website environment with apache(I hope to god that you chose the right set up while you installed your script, this is for CentOS cause Ubuntu is trash"
+
+if [[ ping -c 4 -q 8.8.8.8 ]]; then
+	echo "networking fine"
+else 
+	read -p "enter your ip and subnet and gateway: " IPADDR ": " SUBNET ": " GATEWAY 
+	echo
+	read -p "enter"
+	ifconfig add $IPADDR 
+fi
+
+
+
+IP2="TYPE=Ethernet
+PROXY_METHOD=none
+BROWSER_ONLY=no
+BOOTPROTO=none
+DEFROUTE=yes
+IPV4_FAILURE_FATAL=no
+IPV6INIT=yes
+IPV6_AUTOCONF=yes
+IPV6_DEFROUTE=yes
+IPV6_FAILURE_FATAL=no
+IPV6_ADDR_GEN_MODE=stable-privacy
+NAME=eth0
+UUID=4bedb02d-e481-4740-b03e-1fc060a50f88
+DEVICE=eth0
+ONBOOT=yes
+IPADDR=192.168.0.69
+PREFIX=16
+GATEWAY=192.168.0.1
+DNS1=8.8.8.8
+DNS2=192.168.0.1
+DNS3=8.8.4.4
+"
+
+DNS="search acme.com
+nameserver 10.0.0.1
+nameserver 8.8.8.8"
+
+
+yum update -y
+
+CDROMTE=$(blkid /dev/sr0 && echo $?)
+if [[ ! $(rpm -qa | grep xe-guest) ]]; then
+	while [[ ! $CDROMTE == 0 ]]; do
+		echo "mount the agent into cdrom"
+	done
+
+	if [[ $CDROMTE == 0 ]]; then
+		echo "Trying to mount the agent, I hope you dont have anything in /mnt"
+		mount /dev/cdrom /mnt/
+
+		caro=`find /some/dir -mindepth 1`
+		
+		if [[ $(echo $?) == 1 ]]; then
+			echo "issues mounting" && if [[ $caro ]]; then mkdir /mnt/xe-gu/; fi && mount -o ro,force /dev/cdrom /mnt/xe-gu/ && bash /mnt/xe-gu/Linux/install.sh -n || echo "Sometin wong"
+		fi
+
+		bash /mnt/Linux/install.sh -n
+
+	fi
+
+
+fi
+
+yum grouplist
+yum groupinstall "Basic Web Server" -y
+
+
+yum install system-config-network docker php httpd ifconfig mariadb-server mariadb git epel-release tmux -y && yum install lsyncd -y
+yum --enablerepo=extras install epel-release
+
+service httpd restart
+service mariadb restart
+service docker restart
+service lsyncd restart
+chkconfig httpd on
+chkconfig docker on
+chkconfig mariadb on
+chkconfig lsyncd on
+
+mkdir /$USER/dockerstuff && chmod -R 775 /$USER/dockerstuff
+mkdir /$USER/websitestuff && chmod -R 775 /$USER/websitestuff
+
+docker run  -it -d -p 669:669 --name Bastion ubuntu /bin/bash
+
+NODES="apt update ; 
+apt upgrade -y ; 
+apt install nodejs -y ; 
+npm install -g brackets ;
+ln -s /usr/local/tmp ~/tmp ;
+brackets --port 680 --proj-dir ~/$USER/websitestuff --supp-dir ~/my-project/
+"
+##I would rather sync in isolated than give access
+
+docker run --privileged -d -p 629:629 -p 680:680 -v /$USER/websitestuff:/var/www --name nodejsserver ubuntu  /bin/bash $NODES
+
+docker exec -ti nodejsserver sh -c  $NODES
+
+
+
+
+
+
+
+
