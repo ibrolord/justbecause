@@ -197,9 +197,9 @@ while true; do
 			;;
 		4) echo "installing AWSCLI"
 		awstin(){
-		if [[ $(which python) ]]; then yum install python -y; fi
+		if [[ ! $(which python) ]]; then yum install python -y; fi
 		echo "your python verion: $(python --v)"
-		if [[ -d ~/pip ]]; then mkdir ~/pip && cd ~/pip && curl -O https://bootstrap.pypa.io/get-pip.py; else cd ~/pip && curl -O https://bootstrap.pypa.io/get-pip.py; fi
+		if [[ ! -d ~/pip ]]; then mkdir ~/pip && cd ~/pip && curl -O https://bootstrap.pypa.io/get-pip.py; else cd ~/pip && curl -O https://bootstrap.pypa.io/get-pip.py; fi
 		export PATH=~/.local/bin:$PATH
 		echo "export PATH=~/.local/bin:$PATH" >> ~/.bash_profile
 		pip --version
