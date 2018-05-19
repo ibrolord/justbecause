@@ -4,6 +4,10 @@ echo "So you have messed your server again"
 ################################################################
 echo -n "this will setup your website environment with apache(I hope to god that you chose the right set up while you installed your script, this is for CentOS cause Ubuntu is trash"
 
+read -s -p "Enter your wordpress DATABASE password: " PASS
+echo
+read -s -p "Enter your wordpress DATABASE user: " USER
+
 if [[ ping -c 4 -q 8.8.8.8 ]]; then
 	echo "networking fine"
 else 
@@ -88,19 +92,69 @@ mkdir /$USER/dockerstuff && chmod -R 775 /$USER/dockerstuff
 mkdir /$USER/websitestuff && chmod -R 775 /$USER/websitestuff
 
 docker run  -it -d -p 669:669 --name Bastion ubuntu /bin/bash
+#docker exec -ti Bastion /bin/bash -c "apt update ; apt upgrade -y ; apt install ufw -y ; ufw enable ; ufw allow 669 "
 
-NODES="apt update ; 
+NODES="exec 5> $USER/debug.txt ;
+BASH_XTRACEFD="5" ;
+PS4='${LINENO}:' ;
+set -x ;
+apt update ; 
 apt upgrade -y ; 
 apt install nodejs -y ; 
+apt install git npm -y ;
 npm install -g brackets ;
 ln -s /usr/local/tmp ~/tmp ;
-brackets --port 680 --proj-dir ~/$USER/websitestuff --supp-dir ~/my-project/
+apt install ufw -y ;
+ufw enable ;
+ufw allow 680 ;
+service ufw restart ;
+ufw reload ;
+exit
 "
 ##I would rather sync in isolated than give access
+firewall-cmd --zone=public --permanent --add-port=669/tcp
+firewall-cmd --zone=public --permanent --add-port=629/tcp
+firewall-cmd --zone=public --permanent --add-port=680/tcp
+firewall-cmd --zone=public --permanent --add-port=680/udp
+firewall-cmd --zone=public --permanent --add-port=669/udp
+firewall-cmd --zone=public --permanent --add-port=80/tcp
+firewall-cmd --zone=public --permanent --add-port=80/udp
+firewall-cmd --zone=public --permanent --add-port=443/tcp
+firewall-cmd --zone=public --permanent --add-port=443/udp
+firewall-cmd --reload
 
-docker run --privileged -d -p 629:629 -p 680:680 -v /$USER/websitestuff:/var/www --name nodejsserver ubuntu  /bin/bash $NODES
 
-docker exec -ti nodejsserver sh -c  $NODES
+docker run --privileged -dit -p 629:629 -p 680:680 -v /$USER/websitestuff:/var/www --name nodejsserver ubuntu  
+docker exec -ti nodejsserver /bin/bash -c  "$NODES"
+docker exec -ti nodejsserver /bin/bash -c  "brackets --port 680 --proj-dir /$USER/websitestuff --supp-dir ~/my-project/ " &
+#docker inspect --format="{{.Id}}" namebrac
+echo "committing the containers into the hand of the lord"
+docker commit nodejsserver
+docker commit Bastion
+
+lsyncd -rsync /root/websitestuff/ /var/www/html/ -insist -delay 0
+echo "lsyncd -rsync /root/websitestuff/ /var/www/html/ -insist -delay 0" >> /etc/rc.local
+mysql -u root -e "CREATE DATABASE wordpress"
+mysql -u root -e "CREATE USER $USER@localhost IDENTIFIED BY $PASS"
+mysql -u root -e "GRANT ALL PRIVILEGES ON wordpress.* TO $USER@localhost IDENTIFIED BY $PASS"
+mysql -u root -e "FLUSH PRIVILEGES"
+
+yum install php-gd -y
+
+mkdir /var/www/html/wordpress && wget http://wordpress.org/latest.tar.gz
+tar xzvf latest.tar.gz -C /var/www/html/ && find -name ^late*gz$ -delete
+chown -R apache:apache /var/www/html/*
+
+cp /var/www/html/wordpress/wp-config-sample.php /var/www/html/wordpress/wp-config.php
+
+sed -i "s/^define('DB_NAME', 'database_name_here')/define('DB_NAME', '$USER') ; s/^define('DB_USER', 'username_here')/define('DB_USER', '$USER') ; s/^define('DB_PASSWORD', 'password_here')/define('DB_PASSWORD', '$PASS') " /var/www/html/wordpress/wp-config.php
+
+##Additions to install Powershell
+##powershell
+
+
+
+
 
 
 
