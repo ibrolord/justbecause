@@ -152,7 +152,84 @@ sed -i "s/^define('DB_NAME', 'database_name_here')/define('DB_NAME', '$USER') ; 
 ##Additions to install Powershell
 ##powershell
 
+echo "Additional unneccessary fancy stuff"
+echo "1) installs powershell"
+echo "2) installs vagrant "
+echo "3) installs byobu"
+echo "4) installs AWSCLI"
+echo "5) installs openstack lol ok"
 
+while true; do
+	read WATSITGONBE
+
+	case $WATSITGONBE in
+		1)	echo "installing powershell"
+			##progress bar is coming
+			if [[ -d ~/powershell ]]; then mkdir ~/powershell && cd ~/powershell; fi
+			yum install -y powershell
+			echo "alias pwsh=powershell"
+			exit
+			;;
+		2)	echo "installing vagrant"
+			yum -y install gcc dkms make qt libgomp patch 
+			yum -y install kernel-headers kernel-devel binutils glibc-headers glibc-devel font-forge
+			cd /etc/yum.repo.d/ && wget http://download.virtualbox.org/virtualbox/rpm/rhel/virtualbox.repo
+			yum install -y VirtualBox-5.1
+			/sbin/rcvboxdrv setup
+			yum -y install https://releases.hashicorp.com/vagrant/1.9.6/vagrant_1.9.6_x86_64.rpm
+			mkdir ~/vagrant-home && cd ~/vagrant-home
+			echo "Vagrant instructions 
+				# vagrant halt     [shutdown server]
+				# vagrant up       [start server]
+				# vagrant destroy  [delete server]"
+			sleep 4
+			read -p "Do you want to install Ubuntu? " YESU
+			read -p "Do you want to install CentOS? " YESC
+			if [[ $YESU =~ ^y(es)?$ ]]; then
+				vagrant init ubuntu/xenial164
+			elif [[ $YESC =~ ^y(es)?$ ]]; then
+				vagrant init centos/7
+			exit
+			;;
+		3) echo "installing byobu"
+			yum install byobu -y
+			;;
+		4) echo "installing AWSCLI"
+		awstin(){
+		if [[ $(which python) ]]; then yum install python -y; fi
+		echo "your python verion: $(python --v)"
+		if [[ -d ~/pip ]]; then mkdir ~/pip && cd ~/pip && curl -O https://bootstrap.pypa.io/get-pip.py; else cd ~/pip && curl -O https://bootstrap.pypa.io/get-pip.py; fi
+		export PATH=~/.local/bin:$PATH
+		echo "export PATH=~/.local/bin:$PATH" >> ~/.bash_profile
+		pip --version
+		echo "your python verion: $(pip --v)"
+		pip install awscli --upgrade --user
+		echo "your python verion: $(aws --version)"
+		}
+		echo -n "Do you want an isolated AWSCLI env or nah, note; if yes we will run this a docker environment keeping your keys safe if you get compromized, not convinient however because you would have to do your volume mountings and whatnot, if no then we just install AWSCLI on your host machine and you just have to keep it safe. The goal is to protect your AWS pragmatic or whateva access keys"
+		echo -n "yes for (install in isolated env:docker) no or wrong anwser for (just install anywhere fam u stressin)"
+		sleep 3
+		read -s ANZ
+		if [[ &ANZ =~ ^y(es)?$ ]]; then
+			docker run --privileged -dit -v /$USER/dockerstuff:/$USER --name awscli ubuntu 
+			docker exec -ti awscli /bin/bash -c  "awstin"
+		else	
+			awscli
+		fi
+		;;
+	5) echo "Bruh are yiu sure, this will consume alot of resources"
+	##comin soon, least of priorities
+		;;
+	*)	echo "scuuz me ?"
+		;;
+	b) 
+		echo "See ya"
+		break
+		;;
+
+	esac
+done
+echo
 
 
 
