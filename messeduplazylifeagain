@@ -158,17 +158,18 @@ echo "2) installs vagrant "
 echo "3) installs byobu"
 echo "4) installs AWSCLI"
 echo "5) installs openstack lol ok"
+echo "b) bye"
 
 while true; do
 	read WATSITGONBE
 
 	case $WATSITGONBE in
 		1)	echo "installing powershell"
-			##progress bar is coming
+			curl https://packages.microsoft.com/config/rhel/7/prod.repo | sudo tee /etc/yum.repos.d/microsoft.repo
+
 			if [[ -d ~/powershell ]]; then mkdir ~/powershell && cd ~/powershell; fi
-			yum install -y powershell
-			echo "alias pwsh=powershell"
-			exit
+			yum install -y powershell && echo "alias pwsh=powershell" >> ~/.bash_profile
+			source ~/.bash_profile
 			;;
 		2)	echo "installing vagrant"
 			yum -y install gcc dkms make qt libgomp patch 
@@ -183,13 +184,13 @@ while true; do
 				# vagrant up       [start server]
 				# vagrant destroy  [delete server]"
 			sleep 4
-			read -p "Do you want to install Ubuntu? " YESU
-			read -p "Do you want to install CentOS? " YESC
-			if [[ $YESU =~ ^y(es)?$ ]]; then
+			echo -n "Do you want to install ubuntu? or Do you want to install centOS? Anse"
+			read -r YESUC
+			if [[ $YESUC =~ ^c|C(entos)?$ ]]; then
 				vagrant init ubuntu/xenial164
-			elif [[ $YESC =~ ^y(es)?$ ]]; then
+			elif [[ $YESUC =~ ^u|U(buntu)?$ ]]; then
 				vagrant init centos/7
-			exit
+			fi
 			;;
 		3) echo "installing byobu"
 			yum install byobu -y
@@ -210,7 +211,7 @@ while true; do
 		echo -n "yes for (install in isolated env:docker) no or wrong anwser for (just install anywhere fam u stressin)"
 		sleep 3
 		read -s ANZ
-		if [[ &ANZ =~ ^y(es)?$ ]]; then
+		if [[ $ANZ =~ ^y(es)?$ ]]; then
 			docker run --privileged -dit -v /$USER/dockerstuff:/$USER --name awscli ubuntu 
 			docker exec -ti awscli /bin/bash -c  "awstin"
 		else	
@@ -220,13 +221,13 @@ while true; do
 	5) echo "Bruh are yiu sure, this will consume alot of resources"
 	##comin soon, least of priorities
 		;;
-	*)	echo "scuuz me ?"
-		;;
 	b) 
 		echo "See ya"
 		break
 		;;
 
+    *)	echo "scuuz me ?"
+		;;	
 	esac
 done
 echo
