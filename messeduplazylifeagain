@@ -198,24 +198,24 @@ while true; do
 		4) echo "installing AWSCLI"
 		awstin(){
 		if [[ ! $(which python) ]]; then yum install python -y; fi
-		echo "your python verion: $(python --v)"
-		if [[ ! -d ~/pip ]]; then mkdir ~/pip && cd ~/pip && curl -O https://bootstrap.pypa.io/get-pip.py; else cd ~/pip && curl -O https://bootstrap.pypa.io/get-pip.py; fi
-		export PATH=~/.local/bin:$PATH
-		echo "export PATH=~/.local/bin:$PATH" >> ~/.bash_profile
+		echo "your python verion: $(python --verion)"
+		if [[ ! -d ~/pip ]]; then mkdir ~/pip && cd ~/pip && curl -O https://bootstrap.pypa.io/get-pip.py; else cd ~/pip && curl -O https://bootstrap.pypa.io/get-pip.py; fi && python ~/pip/get-pip.py --user && export PATH=~/.local/bin:$PATH && echo "export PATH=~/.local/bin:$PATH" >> ~/.bash_profile
 		pip --version
-		echo "your python verion: $(pip --v)"
+		echo "your python verion: $(pip --version)"
 		pip install awscli --upgrade --user
 		echo "your python verion: $(aws --version)"
 		}
 		echo -n "Do you want an isolated AWSCLI env or nah, note; if yes we will run this a docker environment keeping your keys safe if you get compromized, not convinient however because you would have to do your volume mountings and whatnot, if no then we just install AWSCLI on your host machine and you just have to keep it safe. The goal is to protect your AWS pragmatic or whateva access keys"
 		echo -n "yes for (install in isolated env:docker) no or wrong anwser for (just install anywhere fam u stressin)"
 		sleep 3
-		read -s ANZ
+		read -r ANZ
 		if [[ $ANZ =~ ^y(es)?$ ]]; then
-			docker run --privileged -dit -v /$USER/dockerstuff:/$USER --name awscli ubuntu 
-			docker exec -ti awscli /bin/bash -c  "awstin"
+			docker run --privileged -dit -v /$USER/dockerstuff:/$USER --name awscli centos
+			lol=`type awstin | sed '1d;2d;3d;$d;s/--user//;s/pip install awscli --upgrade --user/pip install awscli --upgrade --user --ignore-installed six/'`
+			docker exec -ti awscli /bin/bash -c  "$lol"
+			docker commit awscli
 		else	
-			awscli
+			awstin
 		fi
 		;;
 	5) echo "Bruh are yiu sure, this will consume alot of resources"
