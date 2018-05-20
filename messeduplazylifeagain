@@ -44,7 +44,7 @@ DNS2=$GATEWAY
 DNS3=8.8.4.4
 "
 
-DNS="search acme.com
+DNS="search lazylife.tech
 nameserver 10.0.0.1
 nameserver 8.8.8.8"
 
