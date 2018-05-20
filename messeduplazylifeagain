@@ -211,9 +211,10 @@ while true; do
 		read -r ANZ
 		if [[ $ANZ =~ ^y(es)?$ ]]; then
 			docker run --privileged -dit -v /$USER/dockerstuff:/$USER --name awscli centos
-			lol=`type awstin | sed '1d;2d;3d;$d;s/--user//;s/pip install awscli --upgrade --user/pip install awscli --upgrade --user --ignore-installed six/'`
+			lol=`type awstin | sed '1d;2d;3d;$d;s/--user//;s/pip install awscli --upgrade .*/pip install awscli --upgrade --ignore-installed six/'`
 			docker exec -ti awscli /bin/bash -c  "$lol"
 			docker commit awscli
+			echo "docker start awscli >> /etc/rc.local"
 		else	
 			awstin
 		fi
