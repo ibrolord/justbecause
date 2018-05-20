@@ -14,8 +14,19 @@ read -p "Enter your Docker brackets port (for nodejsserver): " PBRA
 echo
 read -p "Enter your Docker misc port (for nodejsserver): " PRAN
 echo
+read -p "Do you use Xen server? (this is to install Xen extension: "QXEN
+echo
 ##look I know that last one disapproves the principles of least to know but, I been there
 
+##I am not even going to ask to debug
+debugtin(){
+	exec 5> debug.txt
+	BASH_XTRACEFD="5"
+	PS4='${LINENO}:'
+	set -x
+}
+debugtin
+##test network
 if [[ `ping -c 4 -q 8.8.8.8` ]]; then
 	echo "networking fine"
 else 
@@ -29,6 +40,7 @@ fi
 
 read -p "Do you want to setup static networking now?(yes/no): " FQUES
 
+##function to config network
 netwokbro(){
 if [[ ! -f /etc/sysconfig/network-scripts/ifcfg-eth0 ]]; then
 	echo "It looks like the usual ifcfg-eth0 does not exist, please pick the appropriate one and type carefully, I have not cleaned this script yet, so you only have to type it well"
@@ -65,12 +77,11 @@ else
 
 fi
 
-
-
 service network restart
 
 }
 
+##if to set up network or nah
 if [[ $FQUES =~ ^y|Y(es)$? ]]; then
 	read -p "enter your ip: " IPADDR 
 	echo
@@ -81,9 +92,11 @@ if [[ $FQUES =~ ^y|Y(es)$? ]]; then
 	netwokbro
 fi
 
-
 yum update -y
 
+##test fir xen if the extension is mounted
+##might want to take out if not a xen user
+xentin(){
 CDROMTE=$(blkid /dev/sr0 && echo $?)
 if [[ ! $(rpm -qa | grep xe-guest) ]]; then
 	while [[ ! $CDROMTE == 0 ]]; do
@@ -99,21 +112,26 @@ if [[ ! $(rpm -qa | grep xe-guest) ]]; then
 		if [[ $(echo $?) == 1 ]]; then
 			echo "issues mounting" && if [[ $caro ]]; then mkdir /mnt/xe-gu/; fi && mount -o ro,force /dev/cdrom /mnt/xe-gu/ && bash /mnt/xe-gu/Linux/install.sh -n || echo "Sometin wong"
 		fi
-
 		bash /mnt/Linux/install.sh -n
-
 	fi
+fi
+}
 
-
+##test the question I asked before
+if [[ $QXEN =~ y|Y(es)$? ]]; then
+	xentin
 fi
 
+##installs Webserver 
 yum grouplist
 yum groupinstall "Basic Web Server" -y
 
-
+##Install Misc
 yum install system-config-network docker php httpd ifconfig mariadb-server mariadb git epel-release tmux -y && yum install lsyncd -y
 yum --enablerepo=extras install epel-release
 
+
+##prep the services
 service httpd restart
 service mariadb restart
 service docker restart
@@ -123,12 +141,15 @@ chkconfig docker on
 chkconfig mariadb on
 chkconfig lsyncd on
 
+##prep docker dirs
 mkdir /$USER/dockerstuff && chmod -R 775 /$USER/dockerstuff
 mkdir /$USER/websitestuff && chmod -R 775 /$USER/websitestuff
 
+##run docker with the ports specified
 docker run  -it -d -p $PSSH:$PSSH --name Bastion ubuntu /bin/bash
 #docker exec -ti Bastion /bin/bash -c "apt update ; apt upgrade -y ; apt install ufw -y ; ufw enable ; ufw allow 789789 "
 
+##commnds for docker
 NODES="exec 5> $USER/debug.txt ;
 BASH_XTRACEFD="5" ;
 PS4='${LINENO}:' ;
@@ -148,6 +169,7 @@ exit
 "
 
 ##I would rather sync in isolated than give access
+##set firewall
 firewall-cmd --zone=public --permanent --add-port=$PSSH/tcp
 firewall-cmd --zone=public --permanent --add-port=$PRAN/tcp
 firewall-cmd --zone=public --permanent --add-port=$PBRA/tcp
@@ -159,6 +181,7 @@ firewall-cmd --zone=public --permanent --add-port=443/tcp
 firewall-cmd --zone=public --permanent --add-port=443/udp
 firewall-cmd --reload
 
+##setup docker brakets nodejs server
 docker run --privileged -dit -p $PRAN:$PRAN -p $PBRA:$PBRA -v /$USER/websitestuff:/var/www --name nodejsserver ubuntu  
 docker exec -ti nodejsserver /bin/bash -c  "$NODES"
 docker exec -ti nodejsserver /bin/bash -c  "brackets --port 680 --proj-dir /$USER/websitestuff --supp-dir ~/my-project/ " &
@@ -167,8 +190,15 @@ echo "committing the containers into the hand of the lord"
 docker commit nodejsserver
 docker commit Bastion
 
+##add docker to startup
+echo "docker start Bastion" >> /etc/rc.local
+echo "docker start nodejsserver" >> /etc/rc.local
+
+##deamonize the dirs neccessary
 lsyncd -rsync /root/websitestuff/ /var/www/html/ -insist -delay 0
 echo "lsyncd -rsync /root/websitestuff/ /var/www/html/ -insist -delay 0" >> /etc/rc.local
+
+##setup wordpress database
 mysql -u root -e "CREATE DATABASE wordpress"
 mysql -u root -e "CREATE USER $USER@localhost IDENTIFIED BY $PASS"
 mysql -u root -e "GRANT ALL PRIVILEGES ON wordpress.* TO $USER@localhost IDENTIFIED BY $PASS"
@@ -250,12 +280,12 @@ while true; do
 			lol=`type awstin | sed '1d;2d;3d;$d;s/--user//;s/pip install awscli --upgrade .*/pip install awscli --upgrade --ignore-installed six/'`
 			docker exec -ti awscli /bin/bash -c  "$lol"
 			docker commit awscli
-			echo "docker start awscli >> /etc/rc.local"
+			echo "docker start awscli" >> /etc/rc.local
 		else	
 			awstin
 		fi
 		;;
-	5) echo "Bruh are yiu sure, this will consume alot of resources"
+	5) echo "Bruh are you sure, this will consume alot of resources"
 	##comin soon, least of priorities
 		;;
 	b) 
