@@ -8,13 +8,15 @@ read -s -p "Enter your wordpress DATABASE password: " PASS
 echo
 read -s -p "Enter your wordpress DATABASE user: " USER
 
-if [[ ping -c 4 -q 8.8.8.8 ]]; then
+if [[ `ping -c 4 -q 8.8.8.8` ]]; then
 	echo "networking fine"
 else 
-	read -p "enter your ip and subnet and gateway: " IPADDR ": " SUBNET ": " GATEWAY 
+	read -p "enter your ip: " IPADDR 
 	echo
-	read -p "enter"
-	ifconfig add $IPADDR 
+	read -p "enter your subnet: " SUBNET
+	echo
+	read -p "enter your gateway: " GATEWAY 
+	echo
 fi
 
 
@@ -34,11 +36,11 @@ NAME=eth0
 UUID=4bedb02d-e481-4740-b03e-1fc060a50f88
 DEVICE=eth0
 ONBOOT=yes
-IPADDR=192.168.0.69
+IPADDR=$IPADDR
 PREFIX=16
-GATEWAY=192.168.0.1
+GATEWAY=$GATEWAY
 DNS1=8.8.8.8
-DNS2=192.168.0.1
+DNS2=$GATEWAY
 DNS3=8.8.4.4
 "
 
@@ -46,6 +48,7 @@ DNS="search acme.com
 nameserver 10.0.0.1
 nameserver 8.8.8.8"
 
+service network restart
 
 yum update -y
 
