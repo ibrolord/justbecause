@@ -3,17 +3,23 @@
 echo "So you have messed your server again"
 ################################################################
 echo -n "this will setup your website environment with apache(I hope to god that you chose the right set up while you installed your script, this is for CentOS cause Ubuntu is trash"
-
+##info gathering
 read -s -p "Enter your wordpress DATABASE password: " PASS
 echo
 read -s -p "Enter your wordpress DATABASE user: " USER
+echo 
+read -p "Enter your Docker SSH port (for bastion): " PSSH
+echo
+read -p "Enter your Docker brackets port (for nodejsserver): " PBRA
+echo
+read -p "Enter your Docker misc port (for nodejsserver): " PRAN
+echo
+##look I know that last one disapproves the principles of least to know but, I been there
 
 if [[ `ping -c 4 -q 8.8.8.8` ]]; then
 	echo "networking fine"
 else 
 	read -p "enter your ip: " IPADDR 
-	echo
-	read -p "enter your subnet: " SUBNET
 	echo
 	read -p "enter your gateway: " GATEWAY 
 	echo
@@ -21,74 +27,60 @@ else
 	echo
 fi
 
-TYPE="Ethernet"
-PROXY_METHOD="none"
-BROWSER_ONLY="no"
-BOOTPROTO="dhcp"
-DEFROUTE="yes"
-IPV4_FAILURE_FATAL="no"
-IPV6INIT="yes"
-IPV6_AUTOCONF="yes"
-IPV6_DEFROUTE="yes"
-IPV6_FAILURE_FATAL="no"
-IPV6_ADDR_GEN_MODE="stable-privacy"
-NAME="eth0"
-UUID="6815ea02-cb63-4f39-9d36-bfb63d81967c"
-DEVICE="eth0"
-ONBOOT="yes"
-ZONE=public
-~
+read -p "Do you want to setup static networking now?(yes/no): " FQUES
 
-IP2="TYPE=Ethernet
-PROXY_METHOD=none
-BROWSER_ONLY=no
-BOOTPROTO=none
-DEFROUTE=yes
-IPV4_FAILURE_FATAL=no
-IPV6INIT=yes
-IPV6_AUTOCONF=yes
-IPV6_DEFROUTE=yes
-IPV6_FAILURE_FATAL=no
-IPV6_ADDR_GEN_MODE=stable-privacy
-NAME=eth0
-UUID=4bedb02d-e481-4740-b03e-1fc060a50f88
-DEVICE=eth0
-ONBOOT=yes
-IPADDR=$IPADDR
-PREFIX=16
-GATEWAY=$GATEWAY
-DNS1=8.8.8.8
-DNS2=$GATEWAY
-DNS3=8.8.4.4
-"
+netwokbro(){
 if [[ ! -f /etc/sysconfig/network-scripts/ifcfg-eth0 ]]; then
-	echo "It looks like the usual ifcfg-eth0 does not exist, please pick the appropriate one and type carefully, I have not cleaned it yet, so you only have tp type it well"
+	echo "It looks like the usual ifcfg-eth0 does not exist, please pick the appropriate one and type carefully, I have not cleaned this script yet, so you only have to type it well"
 	ls /etc/sysconfig/network-scripts/
 	read -p "Select a file: " IPFILE
+	while [[ ! -f /etc/sysconfig/network-scripts/$IPFILE ]]; do
+		echo "Youu typed shit, pick a file that exists"
+		read -p "Select a file: " IPFILE
+	done
+	cp /etc/sysconfig/network-scripts/$IPFILE /etc/sysconfig/network-scripts/$IPFILE.bak
+	echo "this only happens rarely so sorry, just change the BOOTPROTO to none, add your IPADDR GATEWAY DNS1-3 PREFIX ie 16, and god be with you "
+	sleep 3
 	vi +'se nu' /etc/sysconfig/network-scripts/$IPFILE
+
+else
+
+	NETF=`grep 'BOOTPROTO="dhcp"' /etc/sysconfig/network-scripts/ifcfg-eth0`
+	BRUH=/etc/sysconfig/network-scripts/ifcfg-eth0
+	if [[ $NETF ]]; then
+		cp /etc/sysconfig/network-scripts/ifcfg-eth0 /etc/sysconfig/network-scripts/ifcfg-eth0.bak
+		echo IPADDR=$IPADDR >> $BRUH
+		echo DNS1=8.8.8.8 >> $BRUH 
+		echo DNS2="$GATEWAY" >> $BRUH
+		echo DNS3="8.8.4.4" >> $BRUH
+		echo GATEWAY="$GATEWAY" >> $BRUH
+		echo PREFIX="$PREF" >> $BRUH
+		sed -i 's/^BOOTPROTO="dhcp"/BOOTPROTO="static"/' $BRUH
+	fi
+
+	test -f /etc/sysconfig/network-scripts/ifcfg-eth0 && cp /etc/sysconfig/network-scripts/ifcfg-eth0 /etc/sysconfig/network-scripts/ifcfg-eth0.bak && sed -i "s/^GATEWAY=.*/GATEWAY=$GATEWAY/;s/^DNS2=.*/DNS2=$GATEWAY/;s/^IPADDR=.*/IPADDR=$IPADDR/" /etc/sysconfig/network-scripts/ifcfg-eth0 || echo "ERROR SOMEWHERE" && sleep 10
+	echo "Clean up your /etc/resolve.conf"
+	vi +"se nu" /etc/resolve.conf
+
+
 fi
 
-NETF=`grep 'BOOTPROTO="dhcp"' /etc/sysconfig/network-scripts/ifcfg-eth0.bak`
-BRUH=/etc/sysconfig/network-scripts/ifcfg-eth0.bak
-if [[ $NETF ]]; then
-	cp /etc/sysconfig/network-scripts/ifcfg-eth0 /etc/sysconfig/network-scripts/ifcfg-eth0.bak
-	echo IPADDR=$IPADDR >> $BRUH
-	echo DNS1=8.8.8.8 >> $BRUH 
-	DNS2="$GATEWAY" >> $BRUH
-	DNS3="8.8.4.4" >> $BRUH
-	GATEWAY="$GATEWAY" >> $BRUH
-	PREFIX="$PREF" >> $BRUH
-fi
 
-test -f /etc/sysconfig/network-scripts/ifcfg-eth0 && cp /etc/sysconfig/network-scripts/ifcfg-eth0 /etc/sysconfig/network-scripts/ifcfg-eth0.bak && sed -i 's/^GATEWAY=.*/GATEWAY=$GATEWAY;s/^DNS2=.*/DNS2=$GATEWAY/;s/^IPADDR=.*/IPADDR=$IPADDR/' /etc/sysconfig/network-scripts/ifcfg-eth0
-
-
-
-DNS="search lazylife.tech
-nameserver 10.0.0.1
-nameserver 8.8.8.8"
 
 service network restart
+
+}
+
+if [[ $FQUES =~ ^y|Y(es)$? ]]; then
+	read -p "enter your ip: " IPADDR 
+	echo
+	read -p "enter your gateway: " GATEWAY 
+	echo
+	read -p "enter your prefix (ie 16): " PREF 
+	echo
+	netwokbro
+fi
+
 
 yum update -y
 
@@ -134,8 +126,8 @@ chkconfig lsyncd on
 mkdir /$USER/dockerstuff && chmod -R 775 /$USER/dockerstuff
 mkdir /$USER/websitestuff && chmod -R 775 /$USER/websitestuff
 
-docker run  -it -d -p 669:669 --name Bastion ubuntu /bin/bash
-#docker exec -ti Bastion /bin/bash -c "apt update ; apt upgrade -y ; apt install ufw -y ; ufw enable ; ufw allow 669 "
+docker run  -it -d -p $PSSH:$PSSH --name Bastion ubuntu /bin/bash
+#docker exec -ti Bastion /bin/bash -c "apt update ; apt upgrade -y ; apt install ufw -y ; ufw enable ; ufw allow 789789 "
 
 NODES="exec 5> $USER/debug.txt ;
 BASH_XTRACEFD="5" ;
@@ -149,25 +141,25 @@ npm install -g brackets ;
 ln -s /usr/local/tmp ~/tmp ;
 apt install ufw -y ;
 ufw enable ;
-ufw allow 680 ;
+ufw allow $PBRA ;
 service ufw restart ;
 ufw reload ;
 exit
 "
+
 ##I would rather sync in isolated than give access
-firewall-cmd --zone=public --permanent --add-port=669/tcp
-firewall-cmd --zone=public --permanent --add-port=629/tcp
-firewall-cmd --zone=public --permanent --add-port=680/tcp
-firewall-cmd --zone=public --permanent --add-port=680/udp
-firewall-cmd --zone=public --permanent --add-port=669/udp
+firewall-cmd --zone=public --permanent --add-port=$PSSH/tcp
+firewall-cmd --zone=public --permanent --add-port=$PRAN/tcp
+firewall-cmd --zone=public --permanent --add-port=$PBRA/tcp
+firewall-cmd --zone=public --permanent --add-port=$PBRA/udp
+firewall-cmd --zone=public --permanent --add-port=$PSSH/udp
 firewall-cmd --zone=public --permanent --add-port=80/tcp
 firewall-cmd --zone=public --permanent --add-port=80/udp
 firewall-cmd --zone=public --permanent --add-port=443/tcp
 firewall-cmd --zone=public --permanent --add-port=443/udp
 firewall-cmd --reload
 
-
-docker run --privileged -dit -p 629:629 -p 680:680 -v /$USER/websitestuff:/var/www --name nodejsserver ubuntu  
+docker run --privileged -dit -p $PRAN:$PRAN -p $PBRA:$PBRA -v /$USER/websitestuff:/var/www --name nodejsserver ubuntu  
 docker exec -ti nodejsserver /bin/bash -c  "$NODES"
 docker exec -ti nodejsserver /bin/bash -c  "brackets --port 680 --proj-dir /$USER/websitestuff --supp-dir ~/my-project/ " &
 #docker inspect --format="{{.Id}}" namebrac
@@ -185,7 +177,7 @@ mysql -u root -e "FLUSH PRIVILEGES"
 yum install php-gd -y
 
 mkdir /var/www/html/wordpress && wget http://wordpress.org/latest.tar.gz
-tar xzvf latest.tar.gz -C /var/www/html/ && find -name ^late*gz$ -delete
+tar -xzvf latest.tar.gz -C /var/www/html/ && find -name ^late*gz$ -delete
 chown -R apache:apache /var/www/html/*
 
 cp /var/www/html/wordpress/wp-config-sample.php /var/www/html/wordpress/wp-config.php
@@ -195,15 +187,16 @@ sed -i "s/^define('DB_NAME', 'database_name_here')/define('DB_NAME', '$USER') ; 
 ##Additions to install Powershell
 ##powershell
 
-echo "Additional unneccessary fancy stuff"
-echo "1) installs powershell"
-echo "2) installs vagrant "
-echo "3) installs byobu"
-echo "4) installs AWSCLI"
-echo "5) installs openstack lol ok"
-echo "b) bye"
-
 while true; do
+	echo
+	echo "Additional unneccessary fancy stuff"
+	echo "1) installs powershell"
+	echo "2) installs vagrant "
+	echo "3) installs byobu"
+	echo "4) installs AWSCLI"
+	echo "5) installs openstack lol ok"
+	echo "b) bye"
+	echo
 	read WATSITGONBE
 
 	case $WATSITGONBE in
