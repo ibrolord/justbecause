@@ -72,8 +72,8 @@ else
 	fi
 
 	test -f /etc/sysconfig/network-scripts/ifcfg-eth0 && cp /etc/sysconfig/network-scripts/ifcfg-eth0 /etc/sysconfig/network-scripts/ifcfg-eth0.bak && sed -i "s/^GATEWAY=.*/GATEWAY=$GATEWAY/;s/^DNS2=.*/DNS2=$GATEWAY/;s/^IPADDR=.*/IPADDR=$IPADDR/" /etc/sysconfig/network-scripts/ifcfg-eth0 || echo "ERROR SOMEWHERE" && sleep 10
-	sleep 1
 	echo "Clean up your /etc/resolv.conf"
+	sleep 2
 	vi +"se nu" /etc/resolv.conf 
 fi
 
@@ -189,6 +189,7 @@ docker exec -ti nodejsserver /bin/bash -c  "brackets --port $PBRA --proj-dir /$U
 echo "committing the containers into the hand of the lord"
 docker commit nodejsserver
 docker commit Bastion
+docker exec -ti nodejsserver /bin/bash -c  "brackets --port $PBRA --proj-dir /$USER/websitestuff --supp-dir ~/my-project/ " &
 
 ##add docker to startup
 echo "docker start Bastion" >> /etc/rc.local
@@ -264,7 +265,7 @@ while true; do
 		4) echo "installing AWSCLI"
 		awstin(){
 		if [[ ! $(which python) ]]; then yum install python -y; fi
-		echo "your python verion: $(python --verion)"
+		echo "your python version: $(python --version)"
 		if [[ ! -d ~/pip ]]; then mkdir ~/pip && cd ~/pip && curl -O https://bootstrap.pypa.io/get-pip.py; else cd ~/pip && curl -O https://bootstrap.pypa.io/get-pip.py; fi && python ~/pip/get-pip.py --user && export PATH=~/.local/bin:$PATH && echo "export PATH=~/.local/bin:$PATH" >> ~/.bash_profile
 		pip --version
 		echo "your python verion: $(pip --version)"
