@@ -240,6 +240,7 @@ while true; do
 	echo "5) installs openstack lol ok"
 	echo "6) installs FTP server"
 	echo "7) setup periodic mysql backup"
+	echo "8) setup HTTPS with Let's Encrypt"
 	echo "b) bye"
 	echo
 	read WATSITGONBE
@@ -431,7 +432,18 @@ systemctl enable pure-ftpd.service
 				ftptin
 			fi
 			
-			
+		
+		;;
+	8)	echo "Setting up HTTPS with Let's Encrypt"
+		read -r -p "Enter you domain name: " $DOM
+		yum install httpd mod_ssl python-certbot-apache -y
+		service restart httpd
+		certbot --apache -d $DOM
+		if [[ ! $(echo $?) == 0 ]]
+				echo "Make sure you have your firewall enabled for 80and443"
+				sleep 5
+				read -p "Press anything to continue: "
+				certbot --apache -d $DOM || certbot -i apache -a webroot -w /var/www/html -d $DOM
 		;;
 	b) 
 		echo "See ya"
