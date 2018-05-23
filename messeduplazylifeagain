@@ -309,26 +309,43 @@ while true; do
 	##comin soon, least of priorities
 		;;
 	6)	echo "installing FTP server and maybe phpmyadmin (courtesy of howtoforge)"
+		echo
+		read -p "Do you want to install this in a docker container? (yes/no): " DOCQ
 			ftptin(){
 				echo
-				echo "Do you want to install phpmyadmin(yes) or 'cmd line or go home'(no)? " PHPQ
+				read -p "Do you want to install phpmyadmin(yes) or 'cmd line or go home'(no)? " PHPQ
 				phpmytin(){
 				if [[ $PHPQ =~ y|Y(es)$? ]]; then
-					yum -y install yum-priorities
-					yum update
-					yum install mariadb mariadb-server phpmyadmin httpd php
 					read -p "Please type the IP to allow phpmyadmin from(only local for security reasons) ie 192.168.0.1 or 192.18.0.0/16: " IPQUE
 					echo
 					read -p "Please describe the phpmyadmin url you want: ie 127.0.0.1/phphide: " URLQ
-					sed -i "s/^Require ip 127.0.0.1/Require ip $IPQUE/ ; s/^Alias \/phpmyadmin.*/Alias \/$URLQ "
+					yum -y install yum-priorities
+					yum update -y
+					yum install mariadb mariadb-server phpmyadmin httpd php -y
+				else
+					yum -y install yum-priorities
+					yum update
+					yum install mariadb mariadb-server phpmyadmin httpd php -y
 				fi
 				}
+				phpmytin
+				echo "your IP is $IPQUE your prefered url is $URLQ "
 				read -p "Did you make a typo?(yes/no): " TYPQ 
+
+				
 				if [[ $TYPQ =~ y|Y(es)$? ]]; then
 					phpmytin
 				fi
+				if [[ $IPQUE = */* ]]; then
+					sed -i 's|Require ip 127.0.0.1|Require ip '"$IPQUE"'| ; s|^Alias /phpmyadmin|Alias /'"$URLQ"' ; s|^Alias /phpMyAdmin|#Alias /phpMyAdmin |' /etc/httpd/conf.d/phpMyAdmin.conf;
+					else
+						sed -i "s/^Require ip 127.0.0.1/Require ip $IPQUE/ ; s/^Alias /phpmyadmin/Alias /$URLQ/ ; s/^Alias \/phpMyAdmin/#Alias \/phpMyAdmin/" /etc/httpd/conf.d/phpMyAdmin.conf
+				fi
+				
 
+				ftpinfo(){
 				yum install pure-ftpd -y
+				echo "So i will give it a database username of pureftpd \n " 
 				read -p "what ftp group would you like to name it: " FTPG 
 				echo
 				read -p "what ftp user would you like to name it: " FTPUS
@@ -336,12 +353,22 @@ while true; do
 				read -p "what ftp uid and gid would you like to name it: (ie 2005): " FTPU
 				echo
 				read -p "what database username would you want: " FDBU
+				echo
 				read -p -s "what database password would you want: " FDBP
+			}
+				ftpinfo
+				echo "your ftp group is $FTPG your ftp user is $FTPUS your gid and uid is $FTPU your ftp databaseuser is $FDBU your database pwd is hidden  "
+				read -p "Did you make a typo?(yes/no): " TYPQ 
+				
+				if [[ $TYPQ =~ y|Y(es)$? ]]; then
+					ftpinfo
+				fi
+				
 				groupadd -g $FTPU $FTPG
 				useradd -u $FTPU -s /bin/false -d /bin/null -c "pureftpd user" -g $FTPG $FTPU
 				firewall-cmd --permanent --zone=public --add-service=ftp
 				firewall-cmd --reload
-				mysql -u root -e "CREATE DATABASE pureftpd;
+				mysql -u root -e "DROP DATABASE pureftpd; CREATE DATABASE pureftpd;
 							GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP ON pureftpd.* TO '$FDBU'@'localhost' IDENTIFIED BY '$FDBP';
 							GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP ON pureftpd.* TO '$FDBU'@'localhost.localdomain' IDENTIFIED BY '$FDBP';
 							FLUSH PRIVILEGES;"
@@ -387,6 +414,18 @@ MySQLGetQTAFS   SELECT QuotaFiles FROM ftpd WHERE User=\"\L\"AND status="1" AND 
 systemctl enable pure-ftpd.service
 systemctl enable pure-ftpd.service
 			}
+
+			if [[ $DOCQ =~ y|Y(es)$? ]]; then
+				mkdir -p /home/ftpserverdir
+				docker run --privileged -dit -v /home/ftpserverdir:/$USER --name ftpserver centos
+				loli=`type ftptin`
+				docker exec -ti awscli /bin/bash -c  "$loli"
+				docker commit ftpserver
+				echo "docker start awscli" >> /etc/rc.local
+			else
+				ftptin
+			fi
+			
 			
 		;;
 	b) 
