@@ -51,7 +51,7 @@ else
 	BRUH=/etc/sysconfig/network-scripts/ifcfg-eth0
 	if [[ $NETF ]]; then
 		cp /etc/sysconfig/network-scripts/ifcfg-eth0 /etc/sysconfig/network-scripts/ifcfg-eth0.bak
-		echo IPADDR=$IPADDR >> $BRUH
+		echo IPADDR="$IPADDR" >> $BRUH
 		echo DNS1="8.8.8.8" >> $BRUH 
 		echo DNS2="$GATEWAY" >> $BRUH
 		echo DNS3="8.8.4.4" >> $BRUH
