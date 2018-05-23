@@ -423,7 +423,7 @@ systemctl enable pure-ftpd.service
 				mkdir -p /home/ftpserverdir
 				docker run --privileged -dit -v /home/ftpserverdir:/$USER -p $PHPP:80 --name ftpserver centos
 				docker start ftpserver
-				sed '{//g;}//g;s/ftptin()//;s/ftptin//;s|ftpinfo()||;s/ftpinfo//;s|phpmytin()||;s/phpmytin//'
+				loli=`type ftptin | sed '{//g;}//g;s/ftptin()//;s/ftptin//;s|ftpinfo()||;s/ftpinfo//;s|phpmytin()||;s/phpmytin//'`
 				docker exec -ti awscli /bin/bash -c  "$loli"
 				docker exec -ti awscli /bin/bash -c  "yum update -y"
 				docker commit ftpserver
