@@ -7,7 +7,7 @@ echo
 ##info gathering
 read -s -p "Enter your wordpress DATABASE password: " PASS
 echo
-read -s -p "Enter your wordpress DATABASE user: " USER
+read -s -p "Enter your wordpress DATABASE user: " DUSER
 echo 
 read -p "Enter your Docker SSH port (for bastion): " PSSH
 echo
@@ -27,17 +27,6 @@ debugtin(){
 	set -x
 }
 debugtin
-##test network
-if [[ `ping -c 4 -q 8.8.8.8` ]]; then
-	echo "networking fine"
-else 
-	read -p "enter your ip: " IPADDR 
-	echo
-	read -p "enter your gateway: " GATEWAY 
-	echo
-	read -p "enter your prefix (ie 16): " PREF 
-	echo
-fi
 
 read -p "Do you want to setup static networking now?(yes/no): " FQUES
 
@@ -63,7 +52,7 @@ else
 	if [[ $NETF ]]; then
 		cp /etc/sysconfig/network-scripts/ifcfg-eth0 /etc/sysconfig/network-scripts/ifcfg-eth0.bak
 		echo IPADDR=$IPADDR >> $BRUH
-		echo DNS1=8.8.8.8 >> $BRUH 
+		echo DNS1="8.8.8.8" >> $BRUH 
 		echo DNS2="$GATEWAY" >> $BRUH
 		echo DNS3="8.8.4.4" >> $BRUH
 		echo GATEWAY="$GATEWAY" >> $BRUH
@@ -92,6 +81,19 @@ if [[ $FQUES =~ ^y|Y(es)$? ]]; then
 	netwokbro
 fi
 
+##test network
+if [[ `ping -c 4 -q 8.8.8.8` ]]; then
+	echo "networking fine"
+else 
+	read -p "enter your ip: " IPADDR 
+	echo
+	read -p "enter your gateway: " GATEWAY 
+	echo
+	read -p "enter your prefix (ie 16): " PREF 
+	echo
+	netwokbro
+fi
+
 yum update -y
 
 ##test fir xen if the extension is mounted
@@ -106,13 +108,12 @@ if [[ ! $(rpm -qa | grep xe-guest) ]]; then
 	if [[ $CDROMTE == 0 ]]; then
 		echo "Trying to mount the agent, I hope you dont have anything in /mnt"
 		mount /dev/cdrom /mnt/
-
-		caro=`find /some/dir -mindepth 1`
 		
 		if [[ $(echo $?) == 1 ]]; then
-			echo "issues mounting" && if [[ $caro ]]; then mkdir /mnt/xe-gu/; fi && mount -o ro,force /dev/cdrom /mnt/xe-gu/ && bash /mnt/xe-gu/Linux/install.sh -n || echo "Sometin wong"
+			caro=`find /mnt/ -mindepth 1 -type d`
+			echo "issues mounting" && if [[ $caro ]]; then mkdir /mnt/xe-gu/; fi && mount -o ro,force /dev/cdrom /mnt/xe-gu/ && bash /mnt/xe-gu/Linux/install.sh -n || echo "Sometin wong" && rm -rf /mnt/xe-gu && mkdir /mnt/xe-gu
 		fi
-		bash /mnt/Linux/install.sh -n
+		if [[ -f /mnt/Linux/install.sh ]]; then bash /mnt/Linux/install.sh -n; fi
 	fi
 fi
 }
@@ -156,7 +157,7 @@ PS4='${LINENO}:' ;
 set -x ;
 apt update ; 
 apt upgrade -y ; 
-apt install nodejs -y ; 
+apt install vim nano nodejs -y ; 
 apt install git npm -y ;
 npm install -g brackets ;
 ln -s /usr/local/tmp ~/tmp ;
@@ -185,15 +186,16 @@ firewall-cmd --reload
 docker run --privileged -dit -p $PRAN:$PRAN -p $PBRA:$PBRA -v /$USER/websitestuff:/var/www --name nodejsserver ubuntu  
 docker exec -ti nodejsserver /bin/bash -c  "$NODES"
 docker exec -ti nodejsserver /bin/bash -c  "brackets --port $PBRA --proj-dir /$USER/websitestuff --supp-dir ~/my-project/ " &
+#docker exec -ti nodejsserver /bin/bash -c  "echo 'brackets --port $PBRA --proj-dir /$USER/websitestuff --supp-dir ~/my-project/ &' >> /etc/rc.local" 
 #docker inspect --format="{{.Id}}" namebrac
 echo "committing the containers into the hand of the lord"
 docker commit nodejsserver
 docker commit Bastion
-docker exec -ti nodejsserver /bin/bash -c  "brackets --port $PBRA --proj-dir /$USER/websitestuff --supp-dir ~/my-project/ " &
+#echo "alias nodejsserver=\"docker exec -ti nodejsserver /bin/bash -c  \"brackets --port $PBRA --proj-dir /$USER/websitestuff --supp-dir ~/my-project/ \" &" >> ~/.bashrc
 
 ##add docker to startup
 echo "docker start Bastion" >> /etc/rc.local
-echo "docker start nodejsserver" >> /etc/rc.local
+#echo "docker start nodejsserver" >> /etc/rc.local
 
 ##deamonize the dirs neccessary
 lsyncd -rsync /root/websitestuff/ /var/www/html/ -insist -delay 0
@@ -213,7 +215,7 @@ chown -R apache:apache /var/www/html/*
 
 cp /var/www/html/wordpress/wp-config-sample.php /var/www/html/wordpress/wp-config.php
 
-sed -i "s/^define('DB_NAME', 'database_name_here')/define('DB_NAME', '$USER') ; s/^define('DB_USER', 'username_here')/define('DB_USER', '$USER') ; s/^define('DB_PASSWORD', 'password_here')/define('DB_PASSWORD', '$PASS') " /var/www/html/wordpress/wp-config.php
+sed -i "s/^define('DB_NAME', 'database_name_here')/define('DB_NAME', '$DUSER')/ ; s/^define('DB_USER', 'username_here')/define('DB_USER', '$USER')/ ; s/^define('DB_PASSWORD', 'password_here')/define('DB_PASSWORD', '$PASS')/ " /var/www/html/wordpress/wp-config.php
 
 ##Additions to install Powershell
 ##powershell
@@ -286,7 +288,9 @@ while true; do
 		else	
 			yum install python-setuptools
 			awstin
+			if [[ ! `type aws` ]]; then pip install awscli --upgrade --user; fi
 		fi
+		echo "Make sure to get your keys, configure aws with aws configure"
 		;;
 	5) echo "Bruh are you sure, this will consume alot of resources"
 	##comin soon, least of priorities
