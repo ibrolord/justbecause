@@ -71,20 +71,7 @@ service network restart
 }
 
 ##if to set up network or nah
-if [[ $FQUES =~ ^y|Y(es)$? ]]; then
-	read -p "enter your ip: " IPADDR 
-	echo
-	read -p "enter your gateway: " GATEWAY 
-	echo
-	read -p "enter your prefix (ie 16): " PREF 
-	echo
-	netwokbro
-fi
-
-##test network
-if [[ `ping -c 4 -q 8.8.8.8` ]]; then
-	echo "networking fine"
-else 
+if [[ $FQUES =~ ^y|Y(es)$? ]] || [[ ! `ping -c 4 -q 8.8.8.8` ]]; then
 	read -p "enter your ip: " IPADDR 
 	echo
 	read -p "enter your gateway: " GATEWAY 
