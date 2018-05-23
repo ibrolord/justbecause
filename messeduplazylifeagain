@@ -2,22 +2,8 @@
 echo "################################################################"
 echo "So you have messed your server again"
 echo "################################################################"
-echo -n "this will setup your website environment with apache(I hope to god that you chose the right set up while you installed your script, this is for CentOS cause Ubuntu is trash"
+echo -n "this will setup your website environment with apache(I hope to god that you chose the right setup while you installed your script, this is for CentOS cause Ubuntu is trash"
 echo
-##info gathering
-read -s -p "Enter your wordpress DATABASE password: " PASS
-echo
-read -s -p "Enter your wordpress DATABASE user: " DUSER
-echo 
-read -p "Enter your Docker SSH port (for bastion): " PSSH
-echo
-read -p "Enter your Docker brackets port (for nodejsserver): " PBRA
-echo
-read -p "Enter your Docker misc port (for nodejsserver): " PRAN
-echo
-read -p "Do you use Xen server? (this is to install Xen extension: " QXEN
-echo
-##look I know that last one disapproves the principles of least to know but, I been there
 
 ##I am not even going to ask to debug
 debugtin(){
@@ -25,11 +11,40 @@ debugtin(){
 	BASH_XTRACEFD="5"
 	PS4='${LINENO}:'
 	set -x
+	echo
+	echo "************************************************************************************************************"
+	echo "there is a debug file now in your current directory  $(pwd), you can tail -f debug.txt to see in real time"
+	echo "************************************************************************************************************"
+	echo
 }
 debugtin
 
-read -p "Do you want to setup static networking now?(yes/no): " FQUES
+##info gathering
+infotin(){
 
+read -p "Enter your wordpress DATABASE user: " DUSER
+echo 
+read -s -p "Enter your wordpress DATABASE password: " PASS
+echo
+read -p "Enter your Docker SSH port (for bastion): " PSSH
+echo
+read -p "Enter your Docker brackets port (for nodejsserver): " PBRA
+echo
+read -p "Enter your Docker misc port (for nodejsserver): " PRAN
+echo
+read -p "Do you use Xen server? (this is to install Xen extension)(yes/no): " QXEN
+echo
+##look I know that last one disapproves the principles of least to know but, I been there
+
+read -p "Do you want to setup static networking now?(yes/no): " FQUES
+}
+infotin
+echo
+##vheck for typo
+read -p "Did you make a typo?(yes/no): " TYPQ 
+if [[ $TYPQ =~ y|Y(es)$? ]]; then
+	infotin
+fi
 ##function to config network
 netwokbro(){
 if [[ ! -f /etc/sysconfig/network-scripts/ifcfg-eth0 ]]; then
@@ -86,19 +101,19 @@ yum update -y
 ##test fir xen if the extension is mounted
 ##might want to take out if not a xen user
 xentin(){
-CDROMTE=$(blkid /dev/sr0 && echo $?)
 if [[ ! $(rpm -qa | grep xe-guest) ]]; then
-	while [[ ! $CDROMTE == 0 ]]; do
+	until [[ `blkid /dev/sr0` ]]; do
 		echo "mount the agent into cdrom"
+		sleep 5
 	done
 
-	if [[ $CDROMTE == 0 ]]; then
+	if [[ `blkid /dev/sr0` ]]; then
 		echo "Trying to mount the agent, I hope you dont have anything in /mnt"
 		mount /dev/cdrom /mnt/
-		
+		##mout into my own directory of chosing
 		if [[ $(echo $?) == 1 ]]; then
 			caro=`find /mnt/ -mindepth 1 -type d`
-			echo "issues mounting" && if [[ $caro ]]; then mkdir /mnt/xe-gu/; fi && mount -o ro,force /dev/cdrom /mnt/xe-gu/ && bash /mnt/xe-gu/Linux/install.sh -n || echo "Sometin wong" && rm -rf /mnt/xe-gu && mkdir /mnt/xe-gu
+			echo "issues mounting" && if [[ $caro ]]; then mkdir /mnt/xe-gu/; fi && mount -o ro,force /dev/cdrom /mnt/xe-gu/ && bash /mnt/xe-gu/Linux/install.sh -n || echo "Sometin wong" && rm -rf /mnt/xe-gu && mkdir /mnt/xe-gu || echo "Sometin wong again will unmount dir" && umount /mnt && mkdir /mnt/xe-gu
 		fi
 		if [[ -f /mnt/Linux/install.sh ]]; then bash /mnt/Linux/install.sh -n; fi
 	fi
@@ -172,13 +187,15 @@ firewall-cmd --reload
 ##setup docker brakets nodejs server
 docker run --privileged -dit -p $PRAN:$PRAN -p $PBRA:$PBRA -v /$USER/websitestuff:/var/www --name nodejsserver ubuntu  
 docker exec -ti nodejsserver /bin/bash -c  "$NODES"
-docker exec -ti nodejsserver /bin/bash -c  "brackets --port $PBRA --proj-dir /$USER/websitestuff --supp-dir ~/my-project/ " &
+docker exec nodejsserver /bin/bash -c  "brackets --port $PBRA --proj-dir /$USER/websitestuff --supp-dir ~/my-project/ " &
 #docker exec -ti nodejsserver /bin/bash -c  "echo 'brackets --port $PBRA --proj-dir /$USER/websitestuff --supp-dir ~/my-project/ &' >> /etc/rc.local" 
 #docker inspect --format="{{.Id}}" namebrac
 echo "committing the containers into the hand of the lord"
 docker commit nodejsserver
 docker commit Bastion
 #echo "alias nodejsserver=\"docker exec -ti nodejsserver /bin/bash -c  \"brackets --port $PBRA --proj-dir /$USER/websitestuff --supp-dir ~/my-project/ \" &" >> ~/.bashrc
+echo 'docker exec -ti nodejsserver /bin/bash -c  "brackets --port $PBRA --proj-dir /$USER/websitestuff --supp-dir ~/my-project/ " & is the command to start your brackets server'
+#docker exec nodejsserver /bin/bash -c  "brackets --port $PBRA --proj-dir /$USER/websitestuff --supp-dir ~/my-project/ " &
 
 ##add docker to startup
 echo "docker start Bastion" >> /etc/rc.local
@@ -189,10 +206,11 @@ lsyncd -rsync /root/websitestuff/ /var/www/html/ -insist -delay 0
 echo "lsyncd -rsync /root/websitestuff/ /var/www/html/ -insist -delay 0" >> /etc/rc.local
 
 ##setup wordpress database
-mysql -u root -e "CREATE DATABASE wordpress"
-mysql -u root -e "CREATE USER $DUSER@localhost IDENTIFIED BY $PASS"
-mysql -u root -e "GRANT ALL PRIVILEGES ON wordpress.* TO $DUSER@localhost IDENTIFIED BY $PASS"
-mysql -u root -e "FLUSH PRIVILEGES"
+mysql -u root -e "FLUSH PRIVILEGES;"
+mysql -u root -e "CREATE DATABASE wordpress;"
+mysql -u root -e "CREATE USER $DUSER@localhost IDENTIFIED BY '$PASS';"
+mysql -u root -e "GRANT ALL PRIVILEGES ON wordpress.* TO $DUSER@localhost IDENTIFIED BY '$PASS';"
+mysql -u root -e "FLUSH PRIVILEGES;"
 
 yum install php-gd -y
 
@@ -262,10 +280,10 @@ while true; do
 		echo "your python verion: $(aws --version)"
 		}
 		echo -n "Do you want an isolated AWSCLI env or nah, note; if yes we will run this a docker environment keeping your keys safe if you get compromized, not convinient however because you would have to do your volume mountings and whatnot, if no then we just install AWSCLI on your host machine and you just have to keep it safe. The goal is to protect your AWS pragmatic or whateva access keys"
-		echo -n "yes for (install in isolated env:docker) no or wrong anwser for (just install anywhere fam u stressin)"
+		echo -n "yes for (install in isolated env:docker) no or wrong anwser for (just install anywhere fam u stressin)(yes/no): "
 		sleep 3
 		echo
-		read -r ANZ
+		read -r -p "(yes/no): " ANZ
 		if [[ $ANZ =~ ^y(es)?$ ]]; then
 			docker run --privileged -dit -v /$USER/dockerstuff:/$USER --name awscli centos
 			lol=`type awstin | sed '1d;2d;3d;$d;s/--user//;s/pip install awscli --upgrade .*/pip install awscli --upgrade --ignore-installed six/'`
@@ -273,8 +291,9 @@ while true; do
 			docker commit awscli
 			echo "docker start awscli" >> /etc/rc.local
 		else	
-			yum install python-setuptools
+			yum install python-setuptools -y
 			awstin
+			if [[ ! `type pip` ]]; then python ~/pip/get-pip.py --user ; export PATH=~/.local/bin:$PATH ; echo "export PATH=~/.local/bin:$PATH" >> ~/.bash_profile; fi
 			if [[ ! `type aws` ]]; then pip install awscli --upgrade --user; fi
 		fi
 		echo "Make sure to get your keys, configure aws with aws configure"
