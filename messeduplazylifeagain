@@ -190,8 +190,8 @@ echo "lsyncd -rsync /root/websitestuff/ /var/www/html/ -insist -delay 0" >> /etc
 
 ##setup wordpress database
 mysql -u root -e "CREATE DATABASE wordpress"
-mysql -u root -e "CREATE USER $USER@localhost IDENTIFIED BY $PASS"
-mysql -u root -e "GRANT ALL PRIVILEGES ON wordpress.* TO $USER@localhost IDENTIFIED BY $PASS"
+mysql -u root -e "CREATE USER $DUSER@localhost IDENTIFIED BY $PASS"
+mysql -u root -e "GRANT ALL PRIVILEGES ON wordpress.* TO $DUSER@localhost IDENTIFIED BY $PASS"
 mysql -u root -e "FLUSH PRIVILEGES"
 
 yum install php-gd -y
