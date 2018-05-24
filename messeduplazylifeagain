@@ -311,7 +311,7 @@ while true; do
 		;;
 	6)	echo "installing FTP server and maybe phpmyadmin (courtesy of howtoforge)"
 		echo
-		read -p "Do you want to install this in a docker container? (yes/no): " DOCQ
+		#read -p "Do you want to install this in a docker container? (yes/no): " DOCQ
 			ftptin(){
 				echo
 				read -p "Do you want to install phpmyadmin(yes) or 'cmd line or go home'(no)? " PHPQ
@@ -418,12 +418,13 @@ systemctl enable pure-ftpd.service
 systemctl enable pure-ftpd.service
 			}
 
+###This is pretty much from my bad function'sstructure
 			if [[ $DOCQ =~ y|Y(es)$? ]]; then
 				read -p -r "What php port: " PHPP
 				mkdir -p /home/ftpserverdir
 				docker run --privileged -dit -v /home/ftpserverdir:/$USER -p $PHPP:80 --name ftpserver centos
 				docker start ftpserver
-				loli=`type ftptin | sed '{//g;}//g;s/ftptin()//;s/ftptin//;s|ftpinfo()||;s/ftpinfo//;s|phpmytin()||;s/phpmytin//'`
+				loli=`type ftptin | sed '1d;2d;3d;s|.*function.*().*||g;s/{//g;s/}//g;s/ftptin()//;s/ftptin//;s|ftpinfo()||;s/ftpinfo//;s|phpmytin()||;s/phpmytin//'`
 				docker exec -ti awscli /bin/bash -c  "$loli"
 				docker exec -ti awscli /bin/bash -c  "yum update -y"
 				docker commit ftpserver
