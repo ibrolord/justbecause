@@ -1,0 +1,106 @@
+import boto3
+
+def lambda_handler(event, context):
+    client = boto3.client('workspaces')
+    from datetime import date
+    today = str(date.today())
+    # print(event['Records'][0]['ses']['mail']['headers'])
+    
+    # uncomment this for parsing SES emails
+    # dict_ = event['Records'][0]['ses']['mail']['headers']
+    
+    # This is a sample of how the email is available in event object
+    # you can us this as a test data
+    # comment it while testing with SES emails
+    dict_ = {
+        'headers': [
+            {
+                'name': 'From',
+                'value': '"Lastname, Firstname"<sender@company.com>'
+            },
+            {
+                'name': 'To',
+                'value': '"receiver@company.com"<receiver@company.com>'
+            },
+            {
+                'name': 'Subject',
+                'value': 'Start 123456'
+            }
+        ]
+    }
+    
+    for header in dict_['headers']:
+        if header['name'] == 'From':
+            sender = header['value']
+        elif header['name'] == 'Subject':
+            email_subject = header['value']
+        elif header['name'] == 'To':
+            receiver = header['value']
+        else:
+            print('anything else')
+    
+    # Check if the sender is authorized.
+    # https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/workmail.html#WorkMail.Client.describe_user
+    
+    # if the user is NOT authorized
+        # return
+    
+    # check subject to perform action
+    # Subject considered here is in this form <action> <workspace-id>
+        # ex: Stop ds12ds12sd12
+    
+    subject      = email_subject.split(' ')[0]
+    workspace_id = email_subject.split('stratejm.ca')[1]          # For test ppurpose try adding your workspace ids here
+    
+    # print(subject, workspace_id)
+    
+    if subject.lower() == 'create':
+        # https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/workspaces.html#WorkSpaces.Client.start_workspaces
+        response = client.create_workspaces(
+        Workspaces=[
+            {
+                'DirectoryId': 'stratejm.ca',
+                'UserName': 'user',
+                'BundleId': 'wsb-gzk9kl3s8',
+                'UserVolumeEncryptionEnabled': False,
+                'RootVolumeEncryptionEnabled': False,
+                'WorkspaceProperties': {
+                    'RunningMode': 'AUTO_STOP',
+                    'RunningModeAutoStopTimeoutInMinutes': 3,
+                    'UserVolumeSizeGib': 30,
+                    'ComputeTypeName': 'VALUE'
+                },
+                'Tags': [
+                    {
+                        'Key': 'Name',
+                        'Value': today
+                    },
+                ]
+            },
+        ]
+    )
+        
+        # if the request successul do anything 
+        # ex: send email to back to sender, etc
+        if 'FailedRequests' not in response:
+            print('Started')
+            
+    elif subject.lower() == 'stop':
+        # https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/workspaces.html#WorkSpaces.Client.start_workspaces
+        response = client.stop_workspaces(
+            StopWorkspaceRequests=[
+                {
+                    'WorkspaceId': workspace_id
+                }
+            ]
+        )
+        
+        # if the request successul do anything 
+        # ex: send email to back to sender, etc
+        if 'FailedRequests' not in response:
+            print('Stopped')
+
+    else:
+        print(email_subject)        # Just for logging
+        
+        
