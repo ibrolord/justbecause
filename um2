@@ -1,0 +1,30 @@
+import boto3
+from datetime import date
+
+client = boto3.client('workspaces')
+today = str(date.today())
+user = 
+response = client.create_workspaces(
+    Workspaces=[
+        {
+            'DirectoryId': 'stratejm.ca',
+            'UserName': 'user',
+            'BundleId': 'wsb-gzk9kl3s8',
+          #  'VolumeEncryptionKey': 'string',
+            'UserVolumeEncryptionEnabled': False,
+            'RootVolumeEncryptionEnabled': False,
+            'WorkspaceProperties': {
+                'RunningMode': 'AUTO_STOP',
+                'RunningModeAutoStopTimeoutInMinutes': 3,
+                'UserVolumeSizeGib': 30,
+                'ComputeTypeName': 'VALUE'
+            },
+            'Tags': [
+                {
+                    'Key': 'Name',
+                    'Value': today
+                },
+            ]
+        },
+    ]
+)
