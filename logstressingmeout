@@ -1,0 +1,25 @@
+#!/bin/bash
+FILESYSTEM=/dev/ # filesystem to monitor
+Used=5 # delete if FS is over 90% of usage
+LOGPATH=/home/ibro/testa/ #path of the file we want to rid
+LOGFILE=theee #actal file
+
+# Proceed if filesystem capacity is over than the value of Used
+#check for the FileSytem Size
+FSSIZE=$(df -h $FILESYSTEM | awk '{ gsub("%",""); use = $5 }; END { print use }')
+
+#check for the file size
+FSIZE=$(($(stat -c %s output.dat )/1024/1024))
+
+#echo "$FSSIZE $FSIZE"
+
+#run condition again threshold
+if [[ $FSSIZE -gt $Used || FSIZE -gt 1000 ]]                                            then
+    # use find to remove the file and until to make sure that it is removing the file only when the Used capacity is full
+  #  find "$LOGPATH" -name "$LOGFILE" -exec rm -f {} \; || echo "ERROR FINDING $(echo $LOGFILE)"
+        until [[ -f $LOGPATH$LOGFILE ]]
+                do
+                        echo "ERROR FINDING $LOGFILE" > errorfromscript.txt && sleep 15;
+                done
+                        find "$LOGPATH" -name "$LOGFILE" -delete
+fi
