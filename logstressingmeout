@@ -13,7 +13,7 @@ FSIZE=$(($(stat -c %s output.dat )/1024/1024))
 
 #echo "$FSSIZE $FSIZE"
 
-#run condition again threshold
+#run condition against threshold
 if [[ $FSSIZE -gt $Used || FSIZE -gt 1000 ]]                                            then
     # use find to remove the file and until to make sure that it is removing the file only when the Used capacity is full
   #  find "$LOGPATH" -name "$LOGFILE" -exec rm -f {} \; || echo "ERROR FINDING $(echo $LOGFILE)"
