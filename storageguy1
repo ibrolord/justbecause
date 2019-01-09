@@ -24,6 +24,7 @@ firewall-cmd --permanent --zone=public --add-service=rpc-bind
 firewall-cmd --permanent --zone=public --add-service=samba
 firewall-cmd --reload
 cp /etc/samba/smb.conf /etc/samba/smb.conf.orig
+mdadm --create --verbose /dev/md0 --level=0 --name=TEST_RAID --raid-devices=2 /dev/xvdb /dev/xvdc
 parted --script /dev/md0 \
     mklabel gpt \
     mkpart primary 1 90% \
@@ -35,7 +36,7 @@ lvcreate -n LVRaid -l 100%FREE VGRaidVol
  mkfs.xfs -L RaidXFSVol /dev/mapper/VGRaidVol-LVRaid
 mount -L RaidXFSVol /srv/ || exit
 echo "LABEL=RaidXFSVol /srv           xfs     rw,suid,exec,auto,nouser,async,_netdev,acl      0 0" >> /etc/fstab
-
+mount -a || sed '/LABEL=RaidXFSVol/d' /etc/fstab
 
 
 
