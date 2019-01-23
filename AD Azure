@@ -1,0 +1,19 @@
+Import-Module "C:\Program Files\Microsoft Azure AD Sync\Bin\ADSync\ADSync.psd1"
+Start-ADSyncSyncCycle -PolicyType Delta
+$creds = Get-Credentials
+cd 'C:\Program Files\Microsoft Azure Active Directory Connect\'
+Import-Module .\AzureADSSO.psd1
+
+New-AzureADSSOAuthenticationContext
+Update-AzureADSSOForest -OnPremCredentials $creds
+Test-AzureADConnectHealthConnectivity -Role Sync
+Start-ADSyncSyncCycle -PolicyType Delta
+
+
+Set-ExecutionPolicy RemoteSigned
+$UserCredential = Get-Credential
+$Session = New-PSSession -ConfigurationName Microsoft.Exchange -ConnectionUri https://outlook.office365.com/powershell-liveid/ -Credential $UserCredential -Authentication Basic -AllowRedirection
+Import-PSSession $Session -DisableNameChecking
+
+
+
