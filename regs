@@ -1,0 +1,1 @@
+date -d '4 hour ago' "+%m/%d/%Y -%H:%M:%S" && dmesg -T
