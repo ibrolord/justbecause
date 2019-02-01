@@ -1,7 +1,9 @@
 'use strict';
 
+process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 0;
+
 var url = require('url');
-var target = 'https://tasteethnic.com'; // Change this one
+var target = 'https://tasteethnic,com'; // Change this one
 
 exports.handler = function(event, context, callback) {
   var urlObject = url.parse(target);
