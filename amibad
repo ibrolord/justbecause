@@ -1,0 +1,11 @@
+#!/bin/bash
+
+HOSTS=( "ami-x" "ami-x" "ami-x" )
+
+NAME=( "x" "x" "x" )
+
+
+for HOST in ${!HOSTS[*]} ; do
+                        aws ec2 create-image --instance-id ${HOSTS[HOST]} --name "${NAME[$HOST]}" --description "An AMI for my server ${NAME[$HOST]} --no-reboot"   >> amiid
+                        aws ec2 run-instances --image-id ${HOSTS[HOST]} --count 1 --instance-type ${INST[$HOST]} --key-name "Keypair.pem" --security-group-ids sg-x sg-x --subnet-id subnet-x
+                done
