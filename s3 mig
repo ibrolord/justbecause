@@ -1,0 +1,28 @@
+##backup to local
+
+aws s3 ls | awk '{print $3}' | while IFS="" read -r line; do mkdir $line ; aws s3 sync s3://$line $line ; done  
+
+#get buckets #get policy --> file
+
+#attach cross account policy to buckets
+
+#create the user
+
+#create bucket --issue --interediate
+
+#clone
+
+#delete old 
+
+#move old to new again
+
+
+--------
+
+##clone to local -- list and clone
+
+##delete existin
+
+##mk bucket
+
+##sync to me2
