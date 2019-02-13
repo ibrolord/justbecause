@@ -1,2 +1,0 @@
-for i in vol-013109147b2ba3867 vol-0382e040edd41c92f vol-0701b6ac1e0967750 vol-0f1a4d02ba5e89b69 vol-0da8f6419653e0a3e; do aws cloudwatch get-metric-statistics --namespace AWS/EBS --metric-name VolumeConsumedReadWriteOps --dimensions Name=VolumeId,Value=$i --start-time 2019-1-01T00:00:00Z --end-time 2019-1-31T23:59:59Z --period 26
-78400 --statistics Sum --output json; done >> VolUmeIOPS
