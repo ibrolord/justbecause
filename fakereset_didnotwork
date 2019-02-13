@@ -1,5 +1,5 @@
 #!/bin/bash
-array=('d1=(i-x i-x i-0ff3c84a9edcc337e)' 'd2=(vol-x vol-x vol-x)')
+array=('d1=(i-x i-x i-x)' 'd2=(vol-x vol-x vol-x)')
 for elt in "${array[@]}"; do eval $elt; done
         echo " ${d1[@]}  ${d2[@]} "
         aws ec2 create-snapshot --volume-id "${d2[@]}" --description 'Prod backup' --tag-specifications 'ResourceType=snapshot,Tags=[{Key=Name,Value=SafetyCheck},{Key=OCS,Value=Drives}]'
