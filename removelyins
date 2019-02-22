@@ -1,0 +1,7 @@
+#!/bin/bash
+file="subnet.txt"
+while IFS="" read -r line
+do
+        echo $line
+        sed -i "/$line/d" subme.txt
+done < "$file"
