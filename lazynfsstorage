@@ -1,0 +1,46 @@
+#!/bin/bash
+
+exec 5> debug.txt
+	BASH_XTRACEFD="5"
+	PS4='${LINENO}:'
+	set -x
+
+yum update -y
+yum install mdadm lvm2 nfs-utils firewalld autofs -y
+mkdir -p /srv/nfsshare
+chmod -R 755 /srv/nfsshare
+chown nfsnobody:nfsnobody /srv/nfsshare
+systemctl start firewalld
+systemctl enable firewalld
+systemctl status firewalld
+systemctl enable nfs-server
+systemctl enable nfs-lock
+systemctl enable nfs-idmap
+systemctl start nfs-server
+systemctl start nfs-lock
+systemctl start nfs-idmap
+systemctl enable --now autofs
+echo "/srv/nfsshare   *(rw,sync,no_root_squash,no_all_squash)"  >> /etc/exports
+systemctl restart nfs-server
+service firewalld restart
+firewall-cmd --permanent --zone=public --add-service=nfs
+firewall-cmd --reload
+
+DRIVE=("/dev/nvme1n1" "/dev/nvme2n1" "/dev/nvme3n1")
+NAME=("LVMsdb" "LVMsdc" "LVMsdd")
+for i in ${!DRIVE[*]} ; do
+parted --script ${DRIVE[i]} \
+    mklabel gpt \
+    mkpart primary 1 100% \
+    name 1 ${NAME[i]} \
+    set 1 lvm on
+pvcreate ${DRIVE[i]}
+done
+
+vgcreate VGLVMShare $(echo ${DRIVE[*]})
+lvcreate -n LVShareVol -l 100%FREE VGLVMShare
+mkfs.xfs -L ShareXFSVol /dev/mapper/VGLVMShare-LVShareVol
+mount -L ShareXFSVol /srv/ || exit
+echo "LABEL=ShareXFSVol /srv           xfs     rw,suid,exec,auto,nouser,async,_netdev,acl      0 0" >> /etc/fstab
+mount -a || sed '/LABEL=ShareXFSVol/d' /etc/fstab
+
