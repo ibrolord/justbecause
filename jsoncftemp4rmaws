@@ -1,0 +1,75 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Parameters": {
+        "SubnetID": {
+            "Type": "AWS::EC2::Subnet::Id",
+            "Description": "Subnet to deploy EC2 instance into"
+        },
+        "SecurityGroupIDs": {
+            "Type": "List<AWS::EC2::SecurityGroup::Id>",
+            "Description": "List of Security Groups to add to EC2 instance"
+        },
+        "KeyName": {
+            "Type": "AWS::EC2::KeyPair::KeyName",
+            "Description": "Name of an existing EC2 KeyPair to enable SSH access to the instance"
+        },
+        "InstanceType": {
+            "Description": "EC2 instance type",
+            "Type": "String",
+            "Default": "t2.micro"
+        }
+    },
+    "Mappings": {
+        "AWSRegionToAMI": {
+            "us-east-1": {
+                "AMIID": "ami-0b33d91d"
+            },
+            "us-east-2": {
+                "AMIID": "ami-c55673a0"
+            }
+        }
+    },
+    "Resources": {
+        "EC2Instance": {
+            "Type": "AWS::EC2::Instance",
+            "Properties": {
+                "ImageId": {
+                    "Fn::FindInMap": [
+                        "AWSRegionToAMI",
+                        {
+                            "Ref": "AWS::Region"
+                        },
+                        "AMIID"
+                    ]
+                },
+                "InstanceType": {
+                    "Ref": "InstanceType"
+                },
+                "KeyName": {
+                    "Ref": "KeyName"
+                },
+                "SecurityGroupIds": {
+                    "Ref": "SecurityGroupIDs"
+                },
+                "SubnetId": {
+                    "Ref": "SubnetID"
+                },
+                "UserData": {
+                    "Fn::Base64": {
+                        "Fn::Sub": "#!/bin/bash -ex\nyum install -y httpd;\necho \"<html>I love YAML CloudFormation!!</html>\" > /var/www/html/index.html;\ncd /var/www/html;\nchmod 755 index.html;\nservice httpd start;\nchkconfig httpd on;\n"
+                    }
+                },
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "CloudFormation Test - YAML"
+                    },
+                    {
+                        "Key": "Environment",
+                        "Value": "Development"
+                    }
+                ]
+            }
+        }
+    }
+}
