@@ -4,13 +4,15 @@ Resources:
   MyIAMUser:
     Type: AWS::IAM::User
     Properties:
-      Path: "xxx"
-      Loginprofle:
-        Password: 'xx!'
-      Policies:
-        - AmazonS3ReadOnlyAccess
-        - AWSCloudTrailReadOnlyAccess
-      UserName: xx
+      Path: "/userguy/" #should have / in front and back apparently
+      LoginProfile:
+        Password: 'xx'
+      ManagedPolicyArns:
+        - 
+          'arn:aws:iam::aws:policy/AWSCloudTrailReadOnlyAccess'
+        - 
+          'arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess'
+      UserName: userguy
 
   myaccesskey:
     Type: AWS::IAM::AccessKey
@@ -24,13 +26,12 @@ Resources:
       VisibilityTimeout: 0
       QueueName: xx
       DelaySeconds: 0
-      MessageRetentionPeriod: 10
+      MessageRetentionPeriod: 600 #10mins
       ReceiveMessageWaitTimeSeconds: 5
       Tags:
         -
           Key: "Name"
           Value: "SQS"
-  
 
   MySNS:
     Type: AWS::SNS::Topic
@@ -39,11 +40,11 @@ Resources:
       Subscription:
         - 
           Endpoint: 
-            Fn::GetAtt:
+            !GetAtt:
               - "MySQS"
               - "Arn"
           Protocol: "sqs"
-      TopicName: xx
+      TopicName: xxx
 
 Outputs:
   AccessKeyformyaccesskey:
