@@ -2,45 +2,27 @@ AWSTemplateFormatVersion: "2010-09-09"
 Description: Create IAM user, SQS and SNS
 Resources:
   MyIAMUser:
-    Type: AWS::IAM::user
+    Type: AWS::IAM::User
     Properties:
-      Path: "xx"
+      Path: "xxx"
       Loginprofle:
-        Password: 'xx'
+        Password: 'xx!'
       Policies:
         - AmazonS3ReadOnlyAccess
         - AWSCloudTrailReadOnlyAccess
       UserName: xx
 
   myaccesskey:
-  Type: AWS::IAM::AccessKey
-  Properties:
-    UserName:
-      !Ref MyIAMUser
-
-  Output:
-    AccessKeyformyaccesskey:
-      Value:
-        !Ref myaccesskey
-      SecretKeyformyaccesskey:
-        Value: !GetAtt myaccesskey.SecretAccessKey
-
-  '''
-  MySNS:
-    Type: AWS::SNS::Topic
-    Properties: 
-      DisplayName: x
-      TopicName: x
-      Subscription:
-        - Endpoint: ".com"
-          Protocol: email
-  '''
+    Type: AWS::IAM::AccessKey
+    Properties:
+      UserName:
+        !Ref MyIAMUser
 
   MySQS:
     Type: AWS::SQS::Queue
     Properties: 
       VisibilityTimeout: 0
-      QueueName: sqsaocloudtrail
+      QueueName: xx
       DelaySeconds: 0
       MessageRetentionPeriod: 10
       ReceiveMessageWaitTimeSeconds: 5
@@ -48,7 +30,7 @@ Resources:
         -
           Key: "Name"
           Value: "SQS"
-        
+  
 
   MySNS:
     Type: AWS::SNS::Topic
@@ -63,3 +45,8 @@ Resources:
           Protocol: "sqs"
       TopicName: xx
 
+Outputs:
+  AccessKeyformyaccesskey:
+    Value: !Ref myaccesskey
+  SecretKeyformyaccesskey:
+    Value: !GetAtt myaccesskey.SecretAccessKey
