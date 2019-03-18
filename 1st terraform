@@ -1,0 +1,15 @@
+provider "aws"  {
+        region = "ca-central-1"
+        access_key = "you"
+        secret_key = "wish lol"
+}
+
+        resource "aws_s3_bucket" "b"    {
+        bucket = "testedin22323000"
+        acl = "private"
+
+        tags    {
+                Name = "test"
+                Value = "test"
+        }
+}
