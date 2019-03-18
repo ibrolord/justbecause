@@ -1,0 +1,95 @@
+"""
+    python script to get the aggregated average of VolumeConsumedReadWriteOps across all EBS volumes and upload as a single data point
+        please use at your own discretion, and use in a test environment before using in a production environment
+        AWS does not provide code support, and this code is provided on a best effort basis...
+
+    This script has been tested on Lambda using Python/2.7
+"""
+
+import boto3
+import json
+import datetime
+
+cw_client = boto3.client('cloudwatch')
+
+ebs_metric = 'VolumeConsumedReadWriteOps'
+ebs_metric_namespace = 'AWS/EBS'
+ebs_volume_datapoints = []
+ebs_volumes = []
+
+def lambda_handler(event, context):
+    # TODO implement
+    main()
+
+"""
+    get all EBS volumes that have VolumeConsumedReadWriteOps metric available
+    **Used with Provisioned IOPS SSD volumes only**
+"""
+def get_ebs_metrics():
+    ebs_metric_response = cw_client.list_metrics(
+        Namespace=ebs_metric_namespace,
+        MetricName=ebs_metric
+    )
+
+    for metric in ebs_metric_response.get('Metrics'):
+        for volume in metric.get('Dimensions'):
+            ebs_volumes.append(volume['Value'])
+"""
+    Iterate through each volume and get the last data point for VolumeConsumedReadWriteOps
+        and add to our ebs data points list
+"""
+def aggregate_ebs_metrics():
+    get_ebs_metrics()
+
+    for volume in ebs_volumes:
+        get_metric_data_response = cw_client.get_metric_data(
+            MetricDataQueries=[{
+                'Id': volume.replace('-', '_'),
+                'MetricStat': {
+                    'Metric': {
+                        'Namespace': ebs_metric_namespace,
+                        'MetricName': ebs_metric,
+                        'Dimensions': [{
+                            'Name': 'VolumeId',
+                            'Value': volume
+                        }]
+                    },
+                    'Period': 60,
+                    'Stat': 'Average',
+                    'Unit': 'Count'
+                }
+            }],
+            StartTime=datetime.datetime.now() - datetime.timedelta(minutes = 1),
+            EndTime=datetime.datetime.now()
+        )
+        if get_metric_data_response['MetricDataResults'][0]['Values'] == []:
+            print 'No recent metrics to append, append a 0.0 value'
+            ebs_volume_datapoints.append(0.0)
+        else:
+            ebs_volume_datapoints.append(get_metric_data_response['MetricDataResults'][0]['Values'][0])
+"""
+    Aggregate all data points and push it as a single metric
+"""
+def put_aggregated_metric_data():
+    final_data_point = 0
+    for point in ebs_volume_datapoints:
+        final_data_point += point
+
+    put_data_response = cw_client.put_metric_data(
+        Namespace='Custom/EBS',
+        MetricData=[
+            {
+                'MetricName': 'VolumeConsumedReadWriteOpsAggregated',
+                'Timestamp': datetime.datetime.now(),
+                'Value': final_data_point
+            }
+        ]
+    )
+    if put_data_response['ResponseMetadata']['HTTPStatusCode'] == 200:
+        print 'Metric successfully updated: ' + str(final_data_point)
+    else:
+        print 'There was an issue updating the metric: error: ' + str(put_data_response)
+
+def main():
+    aggregate_ebs_metrics()
+    put_aggregated_metric_data()
