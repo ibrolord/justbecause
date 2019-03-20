@@ -11,7 +11,7 @@ NAME=( "x" "x" "x"  "x" "x" "xx" )
 
 for HOST in ${!HOSTS[*]} ; do
                 aws ec2 create-image --instance-id ${HOSTS[HOST]} --name "${NAME[HOST]}" --description "An AMI for my s
-erver ${NAME[$HOST]}" --no-reboot >> amiidv1
+erver ${NAME[$HOST]}" --no-reboot >> amiid
         done
 
 file="amiid"
