@@ -14,8 +14,8 @@ for HOST in ${!HOSTS[*]} ; do
 erver ${NAME[$HOST]}" --no-reboot >> amiidv1
         done
 
-file="amiidv1"
-while IFS="" read -r line; do
-        aws ec2 create-tags --resources $line --tags Key="Name",Value="${NAME[HOST]}" Key=xx,Value="${NAME[HOS
-T]}"
-done < "$file"
+file="amiid"
+readarray -t myarray < $file
+for NAME in ${!NAMES[*]}; do
+ aws ec2 create-tags --resources "${myarray[NAME]}" --tags Key='Name',Value="${NAMES[NAME]}" Key=OCSBusiness,Value="${NAMES[NAME]}"
+done
