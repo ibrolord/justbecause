@@ -1,0 +1,21 @@
+#!/bin/bash
+
+exec 5> debug.txt
+BASH_XTRACEFD="5"
+PS4='${LINENO}:'
+set -x
+
+HOSTS=( "i-x" "i-x" "i-x" "i-x" "i-x" "i-x" )
+
+NAME=( "x" "x" "x"  "x" "x" "xx" )
+
+for HOST in ${!HOSTS[*]} ; do
+                aws ec2 create-image --instance-id ${HOSTS[HOST]} --name "${NAME[HOST]}" --description "An AMI for my s
+erver ${NAME[$HOST]}" --no-reboot >> amiidv1
+        done
+
+file="amiidv1"
+while IFS="" read -r line; do
+        aws ec2 create-tags --resources $line --tags Key="Name",Value="${NAME[HOST]}" Key=xx,Value="${NAME[HOS
+T]}"
+done < "$file"
