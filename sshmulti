@@ -5,5 +5,5 @@ HOSTS="x.x.x.x x.x.x.x"
 SCRIPT="[ `whoami` = root ] || { sudo "$0" "$@"; exit $?; } ; mkdir -p /tmp/patch ; wget -P /tmp/patch https://s3.amazonaws.com/qualys-cloud-agent.x86_64.rpm ; sudo rpm -ivh /tmp/patch/qualys-cloud ; sudo /usr/local/qualys/cloud-agent/bin/qualys-cloud-agent.sh "
 
 for HOST in ${HOSTS} ; do
-        ssh -i /mnt/c/Users/bolaj/Onedrive/Documents/bro/OCS_Keypair.pem -l ${USER} ${HOST} "${SCRIPT}"
+        ssh -i /mnt/c/Users/keypair.pem -l ${USER} ${HOST} "${SCRIPT}"
 done
