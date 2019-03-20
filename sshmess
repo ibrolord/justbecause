@@ -1,0 +1,25 @@
+ for i in x x x; do ssh -i O/Key.pem ubuntu@$i <snmpconfig1; done
+ 
+ if ! grep @snmpserveraddr /etc/rsyslog.d/50-default.conf; then
+        sudo cp /etc/rsyslog.d/50-default.conf /etc/rsyslog.d/50-default.conf.bak
+        sudo  sed -i '/^auth,authpriv.*/i\*.*    @snmpserveraddr'  /etc/rsyslog.d/50-default.conf;
+        sudo service rsyslog restart;
+        echo done;
+fi
+
+
+HOSTS="x x x"
+USER="u"
+sedwhatised() {
+SCRIPTS="if ! grep @x /etc/rsyslog.d/50-default.conf; then
+        cp /etc/rsyslog.d/50-default.conf /etc/rsyslog.d/50-default.conf.bak
+        sed '/^auth,authpriv.*/i\*.*    @'  /etc/rsyslog.d/50-default.conf;
+        echo done;
+fi"
+}
+
+SCRIPT="sudo sedwhatised"
+
+for HOST in ${HOSTS} ; do
+     typeset -f sedwhatised | ssh -i /Keypair.pem -l ${USER} ${HOST} "sudo sedwhatised"
+done
