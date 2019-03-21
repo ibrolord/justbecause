@@ -1,0 +1,11 @@
+if ! sudo grep snmp_monitor /etc/snmp/snmpd.conf ; then
+        sudo su ;
+        sudo service snmpd stop &&
+        sudo net-snmp-create-v3-user -ro -a pwd -X DES user &&
+        sudo service snmpd start &&
+        echo Completed ||
+        echo Failed
+fi
+
+
+for i in x x x ; dp ssh host@i <filecontainingscrpt; done
