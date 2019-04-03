@@ -10,7 +10,7 @@ def lambda_handler(event, context):
         ssl._create_default_https_context = ssl._create_unverified_context    
 
 
-    req = Request("https://demo.stratejm.com")
+    req = Request("https://demo.xxx.com")
     try:
         response = urlopen(req)
     except:
@@ -19,7 +19,7 @@ def lambda_handler(event, context):
         private_key = paramiko.RSAKey.from_private_key(pseudofile)
         c = paramiko.SSHClient()
         c.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        event = {"IP":"172.31.10.179"}
+        event = {"IP":"x.x.x.x"}
         host = event["IP"]
         print("Connecting to " +host)
         c.connect( hostname = host, username = "ec2-user", pkey = private_key )
