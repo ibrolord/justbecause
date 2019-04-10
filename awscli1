@@ -7,3 +7,5 @@ aws ec2 describe-instances --query 'Reservations[].Instances[].[Placement.Availa
 
 
 aws s3 ls | awk '{print $3}' | while IFS="" read -r line ; do aws s3 rm s3://$line --recursive ; aws s3api delete-bucket --bucket $line ; done
+
+ aws ec2 describe-volumes --output text --query 'Volumes[?!not_null(Tags[?Key == `Name`].Value)] | [].[VolumeId,Size,State,SnapshotId,InstanceId]'
