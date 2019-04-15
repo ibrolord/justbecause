@@ -1,11 +1,9 @@
 if ! sudo grep snmp_monitor /etc/snmp/snmpd.conf ; then
-        sudo su ;
+        #sudo su ;
+        sudo rpm -q snmpd || sudo yum install snmpd yum install net-snmp net-snmp-utils -y ;
+        #sudo yum -q list installed snmpd &>/dev/null || sudo yum install snmpd -y &&
         sudo service snmpd stop &&
-        sudo net-snmp-create-v3-user -ro -a pwd -X DES user &&
-        sudo service snmpd start &&
-        echo Completed ||
-        echo Failed
+        sudo net-snmp-create-v3-user -ro -a password -X DES snmp_monitor &&
+        sudo service snmpd start && sudo chkconfig on snmpd || sudo systemctl enable snmpd && sudo service snmpd start &&
+        echo Completed || echo Failed
 fi
-
-
-for i in x x x ; dp ssh host@i <filecontainingscrpt; done
