@@ -1,0 +1,1 @@
+(version of client >= "6.0.0.0") AND (exists true whose (if true then (exists (if exist values of settings "OID" of client then value of setting "OID" of client else error "not set") whose (it as string as lowercase contains "2007" as lowercase)) else false))
