@@ -56,77 +56,82 @@ try:
 			if tag['Key'] == 'Name': #find just the name attrib
 				name = tag['Value']
 				##print = {'Key': 'Name', 'Value': 'geng1'}
-	
+
 		print('Found tagged instances {1}, id: {0}, state: {2}'.format(i.id, name, i.state['Name']))
 
-except Exception as e: #not really relevant but okay
-	print('Error some where', e)
 
-#look for volumes to capture and pass volume information for every single volume
-vols = i.volumes.all() #gets all volume infor from the snapshot 
-for v in vols:
-    ##print v = ec2.Volume(id='vol-0fc9cfc3ebeea28c9')
-    print('{0} is attached to vol {1}, proceeding to snap'.format(name, v.id))
-    volume_ids.extend(v.id)
-    ##print ec2.Instance.volumesCollection(ec2.Instance(id='i-006113f809ecc11e6'), ec2.Volume)
-    snapshot = v.create_snapshot(
-            Description = 'AutoSnap of {0}, on vol {1} - Created {2}'.format(name, v.id, today_string))
-    ##print ec2.Snapshot(id='snap-0c24443ec2da592e6')
-    snapshot.create_tags(
-    	Tags = [
-    	{
-    		'Key': 'auto_Snap',
-    		'Value': 'true'
-    	},
-    	{
-    		'Key': 'volume',
-    		'Value': v.id
-    	},
-    	{
-    		'Key': 'CreatedOn',
-    		'Value': today_string
-    	},
-    	{
-    		'Key': 'OCS',
-    		'Value': 'OCS-Weekly-Snapshot'
-    	},
-    	{
-    		'Key': 'New',
-    		'Value': '{} AutoSnap'.format(name)
-    	}
-    	]
-    	)
- 
-    print('snapshot completed')
-    snapshot_count += 1
-    snap_size_count += snapshot.volume_size ##the ec2.snapshot.volume_size attribute 
+		#look for volumes to capture and pass volume information for every single volume
+		vols = i.volumes.all() #gets all volume infor from the snapshot 
+		for v in vols:
+		    ##print v = ec2.Volume(id='vol-0fc9cfc3ebeea28c9')
+		    print('{0} is attached to vol {1}, proceeding to snap'.format(name, v.id))
+		    time.sleep(5)
+		    volume_ids.extend(v.id)
+		    ##print ec2.Instance.volumesCollection(ec2.Instance(id='i-006113f809ecc11e6'), ec2.Volume)
+		    #time.sleep(5)
+		    snapshot = v.create_snapshot(
+		            Description = 'AutoSnap of {0}, on vol {1} - Created {2}'.format(name, v.id, today_string))
+		    ##print ec2.Snapshot(id='snap-0c24443ec2da592e6')
+		    #time.sleep(5)
+		    snapshot.create_tags(
+		    	Tags = [
+		    	{
+		    		'Key': 'auto_Snap',
+		    		'Value': 'true'
+		    	},
+		    	{
+		    		'Key': 'volume',
+		    		'Value': v.id
+		    	},
+		    	{
+		    		'Key': 'CreatedOn',
+		    		'Value': today_string
+		    	},
+		    	{
+		    		'Key': 'OCS',
+		    		'Value': 'OCS-Weekly-Snapshot'
+		    	},
+		    	{
+		    		'Key': 'Name',
+		    		'Value': '{} AutoSnap'.format(name)
+		    	}
+		    	]
+		    	)
+		 
+		print('snapshot completed')
 
-    snapshots = ec2.snapshots.filter(
-    	Filters=[
-    			{'Name': 'tag:auto_Snap', 'Values': ['true']}
-    	])
+	snapshot_count += 1
+	snap_size_count += snapshot.volume_size ##the ec2.snapshot.volume_size attribute 
 
-    print('Checking for out of date snapshots for instance {0}'.format(name))
-    for snap in snapshots:
-    	##print(snap, snapshots) = ec2.Snapshot(id='snap-0cf2513371232c911') ec2.snapshotsCollection(ec2.ServiceResource(), ec2.Snapshot)
-    	can_del = False
-    	for tag in snap.tags: #get tag of the volume
-    		##print(tag, snap.tags) ec2.Snapshot(id='snap-0cf2513371232c911') ec2.snapshotsCollection(ec2.ServiceResource(), ec2.Snapshot)
-    		#Run conditions based off the tags
-    		if tag['Key'] == 'CreatedOn': #compare the date of the existing snap
-    				create_onstr = tag['Value']
-    		if tag['Key'] == 'auto_Snap': #check if it was from one we made 'auto_snap'
-    			if tag['Value'] == 'true':
-    				can_del = True #if it was, let python know we can delete
-    		if tag['Key'] == 'Name': #get the name to make things clean
-    			name = tag['Value']
-    	created_on = datetime.datetime.strptime(create_onstr, '%Y/%m/%d').date() #uses the cretion time and formats it in a way we can use
+	snapshots = ec2.snapshots.filter(
+		Filters=[
+				{'Name': 'tag:auto_Snap', 'Values': ['true']}
+		])
 
-    	if created_on <= deletion_date and can_del == True: #if the creation time is less than the deletion time we set with timedelta and it has a can_del (if it was auto_snap)
-    		print('snapshots id {0}, ({1}) from {2} is {3} or more days old'.format(snap.id, name, created_on, delet_after_days))
-    		deleted_size += snap.volume_size #+ the new size
-    		print('Snap size is {0} and deleted_size_counter is {1}'.format(name, deleted_size))
-    		snap.delete()
-    		deletion_count += 1
+	print('Checking for out of date snapshots for instance {0}'.format(name))
+	for snap in snapshots:
+		##print(snap, snapshots) = ec2.Snapshot(id='snap-0cf2513371232c911') ec2.snapshotsCollection(ec2.ServiceResource(), ec2.Snapshot)
+		can_del = False
+		for tag in snap.tags: #get tag of the volume
+			##print(tag, snap.tags) ec2.Snapshot(id='snap-0cf2513371232c911') ec2.snapshotsCollection(ec2.ServiceResource(), ec2.Snapshot)
+			#Run conditions based off the tags
+			if tag['Key'] == 'CreatedOn': #compare the date of the existing snap
+					create_onstr = tag['Value']
+			if tag['Key'] == 'auto_Snap': #check if it was from one we made 'auto_snap'
+				if tag['Value'] == 'true':
+					can_del = True #if it was, let python know we can delete
+			if tag['Key'] == 'Name': #get the name to make things clean
+				name = tag['Value']
+		created_on = datetime.datetime.strptime(create_onstr, '%Y/%m/%d').date() #uses the cretion time and formats it in a way we can use
 
-print('Made {0} snapshots totalling {1} GB Deleted {2} snapshots totalling {3} GB'.format(snapshot_count, snap_size_count, deletion_count, deleted_size))
+		if created_on <= deletion_date and can_del == True: #if the creation time is less than the deletion time we set with timedelta and it has a can_del (if it was auto_snap)
+			print('snapshots id {0}, ({1}) from {2} is {3} or more days old'.format(snap.id, name, created_on, delet_after_days))
+			deleted_size += snap.volume_size #+ the new size
+			print('Snap size is {0} and deleted_size_counter is {1}'.format(name, deleted_size))
+			snap.delete()
+			deletion_count += 1
+
+	print('Made {0} snapshots totalling {1} GB Deleted {2} snapshots totalling {3} GB'.format(snapshot_count, snap_size_count, deletion_count, deleted_size))
+
+except Exception as e:
+	print(e)
