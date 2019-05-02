@@ -1,21 +1,22 @@
-import paramiko, io, os, ssl
+import paramiko, os, ssl, io
 from urllib.request import Request, urlopen
 from urllib.error import URLError, HTTPError
 
+
 def lambda_handler(event, context):
-    key = os.environ['key']
     
+    key = os.environ['key']
     if (not os.environ.get('PYTHONHTTPSVERIFY', '') and
         getattr(ssl, '_create_unverified_context', None)):
         ssl._create_default_https_context = ssl._create_unverified_context    
 
 
-    req = Request("https://demo.xxx.com")
+    req = Request("https://demo.x.com")
     try:
         response = urlopen(req)
+
     except:
-        #print('key:', key)
-        pseudofile = io.StringIO(key)
+        pseudofile = io.StringIO(key.replace("\\n","\n"))  ##Lambda encryption breaks your env var with \n and replaces it with \\n. We revert that. SSH pem needs to have 64 bit per line (needs the new line) ie \n)
         private_key = paramiko.RSAKey.from_private_key(pseudofile)
         c = paramiko.SSHClient()
         c.set_missing_host_key_policy(paramiko.AutoAddPolicy())
