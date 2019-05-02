@@ -1,0 +1,23 @@
+import paramiko
+
+ips = ['6.6.6.6', '6.6.6.6']
+user = 'lilwayne'
+commands = ['sudo rpm -q snmpd || sudo yum install snmpd net-snmp net-snmp-utils -y', 'sudo net-snmp-create-v3-user -ro -a PASSWD -X DES USER || rm test && echo Error_in_file | tee test', 'sudo systemctl enable snmpd && sudo service snmpd start || sudo service snmpd start && sudo chkconfig snmpd on && echo "Chkconfig Is On"', 'sudo cp /etc/snmp/snmpd.conf /etc/snmp/snmpd.local.conf && echo "Replicating file"', 'ls']
+
+for ip in ips:
+   try:
+      ssh = paramiko.SSHClient()
+      ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+      ssh.connect(ip, username=user, password='pastorchris', look_for_keys=False)
+      print("Success for %s" % ip)
+      for command in commands:
+            stdin, stdout, stderr = ssh.exec_command(command)
+            print(stdout.read().decode('utf-8'))
+            print(stderr.read().decode('utf-8'))
+
+   except paramiko.SSHException as e:
+      print("EXCEPTION: %s" % e)
+      print("SSH is not responsive for %s" % ip)
+   except Exception as e:
+       print("Exception2: %s  % e IP: {0} Failed \n\n".format(ip))
+       pass  
