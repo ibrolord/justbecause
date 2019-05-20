@@ -1,0 +1,15 @@
+<Configuration>
+<VGpu>Default</VGpu>
+<!-- Disable -->
+<Networking>Default</Networking>
+<!-- Disable -->
+<MappedFolders>
+   <MappedFolder>
+     <HostFolder>D:\te</HostFolder>
+   <!--  <ReadOnly>true</ReadOnly> -->
+   </MappedFolder>
+</MappedFolders>
+<LogonCommand>
+   <Command>explorer.exe D:\te</Command>
+</LogonCommand>
+</Configuration>
