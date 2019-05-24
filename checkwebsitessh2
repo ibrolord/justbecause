@@ -1,38 +1,82 @@
-import paramiko, os, ssl, io
+#!/usr/bin/python
+# -*- coding: utf-8 -*-  
+#used https://www.tutorialspoint.com/online_python_formatter.htm to beautify and autopep8 (The Origanal is posted somewhere in Git here)
+import paramiko
+import os
+import ssl
+import io
+import boto3
 from urllib.request import Request, urlopen
 from urllib.error import URLError, HTTPError
 
 
 def lambda_handler(event, context):
-    
+
+    # #envrionmental Variable put in the lambda with the SSH key
+
     key = os.environ['key']
-    if (not os.environ.get('PYTHONHTTPSVERIFY', '') and
-        getattr(ssl, '_create_unverified_context', None)):
-        ssl._create_default_https_context = ssl._create_unverified_context    
 
+    # #to curb the https issue i had
 
-    req = Request("https://demo.x.com")
+    if not os.environ.get('PYTHONHTTPSVERIFY', '') and getattr(ssl,
+            '_create_unverified_context', None):
+        ssl._create_default_https_context = \
+            ssl._create_unverified_context
+
+    # #request website
+
+    req = Request('https://demo.stratejm.com')
+
+    # #Try if HTTP code for website to see if it is OK
+
     try:
         response = urlopen(req)
-
     except:
-        pseudofile = io.StringIO(key.replace("\\n","\n"))  ##Lambda encryption breaks your env var with \n and replaces it with \\n. We revert that. SSH pem needs to have 64 bit per line (needs the new line) ie \n)
-        private_key = paramiko.RSAKey.from_private_key(pseudofile)
+
+    # #Exception to run paramiko to run SSH commands
+        # #create a pseudofile to stream texts from the environ var into a file to use in paramiko as the SSH file
+
+        pseudofile = io.StringIO(key.replace('\\n', '\n'))  # #You need to add \n for line break on lambda but lambda escapes it with \\n so we reset it back to \n so that it follows the SSH key format of 64 bits per line
+        private_key = paramiko.RSAKey.from_private_key(pseudofile)  # #we use the pseudofule as the Priv key
         c = paramiko.SSHClient()
         c.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        event = {"IP":"x.x.x.x"}
-        host = event["IP"]
-        print("Connecting to " +host)
-        c.connect( hostname = host, username = "ec2-user", pkey = private_key )
-        print( "Connected to " +host )
-        commands = [ "echo `date` ' tested by me' > supp1" ]
-        for command in commands:
+        event = {'IP': 'x.x.x.x'}  # #target IP
+        host = event['IP']
+        print 'Connecting to ' + host
+        c.connect(hostname=host, username='ec2-user', pkey=private_key)  # #Paramiko params to use Priv Key
+        print 'Connected to ' + host
+        commands = \
+            ["echo `date` ' tested by me' > supp1 && sudo killall -9 java"
+             ]
+        for command in commands:  # #In reality we only have one command in this list so the For loop is rudundant, but in case I have to edit in the future
             try:
-                stdin , stdout, stderr = c.exec_command(command)
-                print(stdout.read())
-                print(stderr.read())
-            except paramiko.SSHException as err:
-                print("Errors")
-                print("EXCEPTION: %s" % err)
+                (stdin, stdout, stderr) = c.exec_command(command)
+                print stdout.read()
+                print stderr.read()
+                sns = boto3.client('sns')
+                sns.publish(TopicArn='arn:aws:sns:us-east-1:ewe:Alerts'
+                            ,
+                            Message='MSSP Alert for resetting Java on the Super. \n Test if Super is up https://demo.demo.com'
+                            ,
+                            Subject='MSSP Alert for resetting Java on the Super'
+                            )
+            except paramiko.SSHException, err:
+                print 'Errors'
+                print 'EXCEPTION: %s' % err
+            except Exception, e:
+                print '''Exception2: %s % e 
+
+'''
+
+                # #Send SNS Message
+
+                sns = boto3.client('sns')
+                sns.publish(TopicArn='arn:aws:sns:us-east-1:ewe:Alerts'
+                            ,
+                            Message='''MSSP Alert for resetting Java on the Super. 
+ Issues running Java Reset, check if https://demo.demo.com is up 
+ Troubleshoot Hardware''',
+                            Subject='MSSP Alert for resetting Java on the Super'
+                            )
             finally:
                 c.close()
