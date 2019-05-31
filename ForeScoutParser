@@ -1,0 +1,56 @@
+<eventFormatRecognizer><![CDATA[<:gPatSyslogPRI><:gPatMon>\s+<:gPatDay>\s<:gPatTime>\s<:gPatIpV4Dot>\sCounterACT\[\d+\]: ]]></eventFormatRecognizer>
+<patternDefinitions>
+    <pattern name="gpatCs5"><![CDATA[cs5=(\w+\s?\w+)]]></pattern>
+</patternDefinitions>
+<parsingInstructions>
+    <collectFieldsByRegex src="$_rawmsg">
+      <regex><![CDATA[CounterACT\[\d+\]:<_body:gPatMesgBody>]]></regex>
+    </collectFieldsByRegex>
+    <when test="matches($_rawmsg, 'Uptime')">
+      <collectFieldsByRegex src="$_rawmsg">
+        <regex><![CDATA[Uptime\s<newValue:gPatInt>\sseconds]]></regex>
+      </collectFieldsByRegex>
+      <setEventAttribute attr="eventType">ForeScout - Uptime</setEventAttribute>
+    </when>
+    <when test="matches($_rawmsg, 'Application')">
+      <collectFieldsByKeyValuePair kvsep=":" sep=";" src="$_body">
+        <attrKeyMap attr="avEngineVer" key="Application status"/>
+        <attrKeyMap attr="status" key="Connected clients"/>
+        <attrKeyMap attr="sessionStatus" key="Engine status"/>
+        <attrKeyMap attr="count" key="Attacked Services"/>
+        <attrKeyMap attr="lineContent" key="Installed Plugins"/>
+      </collectFieldsByKeyValuePair>
+    </when>
+    <when test="matches($_rawmsg, 'statistics')">
+      <collectFieldsByKeyValuePair kvsep=":" sep="," src="$_body">
+        <attrKeyMap attr="cpuUtil" key="CPU usage"/>
+        <attrKeyMap attr="freeMemState" key="Available memory"/>
+        <attrKeyMap attr="usedMemKB" key="Used memory"/>
+        <attrKeyMap attr="freeSwapMemKB" key="Available swap"/>
+        <attrKeyMap attr="usedSwapMemKB" key="Used swap"/>
+      </collectFieldsByKeyValuePair>
+    </when>
+    <when test="matches($_rawmsg, 'Log')">
+      <collectFieldsByKeyValuePair kvsep=":" sep=". " src="$_body">
+        <attrKeyMap attr="logText" key="Log"/>
+        <attrKeyMap attr="details" key="Details"/>
+        <attrKeyMap attr="logLevel" key="Severity"/>
+      </collectFieldsByKeyValuePair>
+      <collectFieldsByRegex src="$_rawmsg">
+        <regex><![CDATA[Details:.+?\.<attackInfo:gPatMesgBodyMin>\sSeverity]]></regex>
+      </collectFieldsByRegex>
+    </when>
+    <when test="matches($_rawmsg, 'Scan event')">
+      <collectFieldsByRegex src="$_rawmsg">
+        <regex><![CDATA[Source:\s<jobDetail:gPatIpV4Dot>]]></regex>
+      </collectFieldsByRegex>
+      <setEventAttribute attr="eventType">ForeScout - Scan event</setEventAttribute>
+    </when>
+    <when test="matches($_rawmsg, 'User admin changed')">
+      <collectFieldsByRegex src="$_rawmsg">
+        <regex><![CDATA[Details:\s<incidentDetail:gPatMesgBody>]]></regex>
+      </collectFieldsByRegex>
+      <setEventAttribute attr="eventType">ForeScout - User Admin</setEventAttribute>
+    </when>
+</parsingInstructions>
+
