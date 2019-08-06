@@ -1,0 +1,9 @@
+---
+- hosts: all
+  sudo: yes
+  tasks:
+   - name: Configure Users
+     yum:
+       name: qualys-cloud-agent.x86_64
+       state: absent
+~                            
