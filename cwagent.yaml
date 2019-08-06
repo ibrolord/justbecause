@@ -1,0 +1,13 @@
+---
+- name: Run and exec CloudWatch Agent
+  hosts: all
+  sudo: yes
+  tasks:
+    - name: Transfer the script
+      get_url:
+        url: https://s3.amazonaws.com/amazoncloudwatch-agent/amazon_linux/amd64/latest/amazon-cloudwatch-agent.rpm
+        dest: /tmp
+    - name: Install the file
+      yum:
+        name: /tmp/amazon-cloudwatch-agent.rpm
+        state: present                                          
