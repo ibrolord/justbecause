@@ -1,4 +1,4 @@
-#Dockerfile to Create an Ubuntu environment to run my Python Code
+#Dockerfile to Create an Python environment to run my Python Code
 FROM python:latest
 
 LABEL maintainer="bolajiagunbiade1@gmail.com"
