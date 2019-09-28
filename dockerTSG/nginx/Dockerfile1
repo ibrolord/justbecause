@@ -1,0 +1,30 @@
+#Dockerfile to Create an Ubuntu environment to run my Python Code
+FROM ubuntu:latest
+
+LABEL maintainer="bolajiagunbiade1@gmail.com"
+
+#Make sure that ubuntu is fully updated and patched before making working on it
+RUN apt update && apt upgrade -y
+
+#Install Python3 as the base environment
+RUN apt install apache2 -y
+
+#Ensure to start the Apache2 Service
+#RUN service apache2 start > /log
+
+#Get the code from Github to the /app Direcory
+ADD https://raw.githubusercontent.com/ibrolord/myrepo/master/index.html /var/www/html/index.html
+
+#Set the /app Directory as the Working Directory
+WORKDIR /var/www/html/
+
+#Give Appropriate Permissions
+RUN chmod 644 index.html
+
+#Expose Port 80 on Local Host
+EXPOSE 80
+
+#Start Apache2 in the Background
+CMD [ "apachectl start" ]
+
+
