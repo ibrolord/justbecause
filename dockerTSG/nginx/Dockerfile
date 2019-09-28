@@ -6,9 +6,6 @@ LABEL maintainer="bolajiagunbiade1@gmail.com"
 #Make sure that Centos is fully updated and patched before Installing Apache on it
 RUN yum update -y && yum install httpd -y
 
-#Ensure to start the Apache2 Service & send stdout to /log as a sanity check
-RUN service apache2 start > /log
-
 #Get the code from Github to the /app Direcory
 ADD https://raw.githubusercontent.com/ibrolord/myrepo/master/index.html /var/www/html/index.html
 
