@@ -1,4 +1,4 @@
-#Dockerfile to Create an CentOs environment to run my HTML Code
+#Dockerfile to Create a CentOs environment to run my HTML Code
 FROM centos
 
 LABEL maintainer="bolajiagunbiade1@gmail.com"
