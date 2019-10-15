@@ -1,0 +1,744 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Resources": {
+    "zonegoshenconsultingca": {
+      "Type": "AWS::Route53::HostedZone",
+      "Properties": {
+        "Name": "goshenconsulting.ca.",
+        "HostedZoneConfig": {
+          "Comment": "Charle's website"
+        }
+      }
+    },
+    "dnsgoshenconsultingca": {
+      "Type": "AWS::Route53::RecordSetGroup",
+      "Properties": {
+        "HostedZoneId": {
+          "Ref": "zonegoshenconsultingca"
+        },
+        "RecordSets": [
+          {
+            "Name": "goshenconsulting.ca.",
+            "Type": "TXT",
+            "TTL": "60",
+            "ResourceRecords": [
+              "\"zoho-verification=zb15321501.zmverify.zoho.com\""
+            ]
+          }
+        ]
+      }
+    },
+    "dnsamazonsesgoshenconsultingca": {
+      "Type": "AWS::Route53::RecordSetGroup",
+      "Properties": {
+        "HostedZoneId": {
+          "Ref": "zonegoshenconsultingca"
+        },
+        "RecordSets": [
+          {
+            "Name": "_amazonses.goshenconsulting.ca.",
+            "Type": "TXT",
+            "TTL": "1800",
+            "ResourceRecords": [
+              "\"Bi17aqdQST3J2RmLYH/RYBAoW6xeGAMk4JJyLtveHXQ=\""
+            ]
+          }
+        ]
+      }
+    },
+    "dnsdee982ee41859420c4497e8cb6b27c1cgoshenconsultingca": {
+      "Type": "AWS::Route53::RecordSetGroup",
+      "Properties": {
+        "HostedZoneId": {
+          "Ref": "zonegoshenconsultingca"
+        },
+        "RecordSets": [
+          {
+            "Name": "_dee982ee41859420c4497e8cb6b27c1c.goshenconsulting.ca.",
+            "Type": "CNAME",
+            "TTL": "300",
+            "ResourceRecords": [
+              "_3a132df74ec2fb3507af4edbbf06e315.acm-validations.aws."
+            ]
+          }
+        ]
+      }
+    },
+    "dns4es3xx4hyuk2hbpkxxzfbzdwgzu2cyfvdomainkeygoshenconsultingca": {
+      "Type": "AWS::Route53::RecordSetGroup",
+      "Properties": {
+        "HostedZoneId": {
+          "Ref": "zonegoshenconsultingca"
+        },
+        "RecordSets": [
+          {
+            "Name": "4es3xx4hyuk2hbpkxxzfbzdwgzu2cyfv._domainkey.goshenconsulting.ca.",
+            "Type": "CNAME",
+            "TTL": "1800",
+            "ResourceRecords": [
+              "4es3xx4hyuk2hbpkxxzfbzdwgzu2cyfv.dkim.amazonses.com"
+            ]
+          }
+        ]
+      }
+    },
+    "dns54e2f632jcvmlirdj5lnuk5f2oxybw3xdomainkeygoshenconsultingca": {
+      "Type": "AWS::Route53::RecordSetGroup",
+      "Properties": {
+        "HostedZoneId": {
+          "Ref": "zonegoshenconsultingca"
+        },
+        "RecordSets": [
+          {
+            "Name": "54e2f632jcvmlirdj5lnuk5f2oxybw3x._domainkey.goshenconsulting.ca.",
+            "Type": "CNAME",
+            "TTL": "1800",
+            "ResourceRecords": [
+              "54e2f632jcvmlirdj5lnuk5f2oxybw3x.dkim.amazonses.com"
+            ]
+          }
+        ]
+      }
+    },
+    "dnsn6byvnxcn2vkgzox75jso5vyosopzt45domainkeygoshenconsultingca": {
+      "Type": "AWS::Route53::RecordSetGroup",
+      "Properties": {
+        "HostedZoneId": {
+          "Ref": "zonegoshenconsultingca"
+        },
+        "RecordSets": [
+          {
+            "Name": "n6byvnxcn2vkgzox75jso5vyosopzt45._domainkey.goshenconsulting.ca.",
+            "Type": "CNAME",
+            "TTL": "1800",
+            "ResourceRecords": [
+              "n6byvnxcn2vkgzox75jso5vyosopzt45.dkim.amazonses.com"
+            ]
+          }
+        ]
+      }
+    },
+    "dnscdngoshenconsultingca": {
+      "Type": "AWS::Route53::RecordSetGroup",
+      "Properties": {
+        "HostedZoneId": {
+          "Ref": "zonegoshenconsultingca"
+        },
+        "RecordSets": [
+          {
+            "Name": "cdn.goshenconsulting.ca.",
+            "Type": "A",
+            "AliasTarget": {
+              "HostedZoneId": "Z2FDTNDATAQYW2",
+              "DNSName": "d34nak86sb33w9.cloudfront.net"
+            }
+          }
+        ]
+      }
+    },
+    "dns1f2897f2fa7b3954c689ffe258363358cdngoshenconsultingca": {
+      "Type": "AWS::Route53::RecordSetGroup",
+      "Properties": {
+        "HostedZoneId": {
+          "Ref": "zonegoshenconsultingca"
+        },
+        "RecordSets": [
+          {
+            "Name": "_1f2897f2fa7b3954c689ffe258363358.cdn.goshenconsulting.ca.",
+            "Type": "CNAME",
+            "TTL": "60",
+            "ResourceRecords": [
+              "_89e29a4e693639a84fb0d4ccd71c7925.acm-validations.aws."
+            ]
+          }
+        ]
+      }
+    },
+    "dns823159fdb384ad6774c5c179f8944c9awwwgoshenconsultingca": {
+      "Type": "AWS::Route53::RecordSetGroup",
+      "Properties": {
+        "HostedZoneId": {
+          "Ref": "zonegoshenconsultingca"
+        },
+        "RecordSets": [
+          {
+            "Name": "_823159fdb384ad6774c5c179f8944c9a.www.goshenconsulting.ca.",
+            "Type": "CNAME",
+            "TTL": "60",
+            "ResourceRecords": [
+              "_e68f418bedfb17a7cd04bb22c49795d9.acm-validations.aws."
+            ]
+          }
+        ]
+      }
+    },
+    "vpc07a008beb8f0a242a": {
+      "Type": "AWS::EC2::VPC",
+      "Properties": {
+        "CidrBlock": "10.10.10.0/24",
+        "InstanceTenancy": "default",
+        "EnableDnsSupport": "true",
+        "EnableDnsHostnames": "true",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "CloudformerVPC"
+          }
+        ]
+      }
+    },
+    "vpc7038fc0a": {
+      "Type": "AWS::EC2::VPC",
+      "Properties": {
+        "CidrBlock": "172.31.0.0/16",
+        "InstanceTenancy": "default",
+        "EnableDnsSupport": "true",
+        "EnableDnsHostnames": "true"
+      }
+    },
+    "subnetbf6dde91": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "CidrBlock": "172.31.80.0/20",
+        "AvailabilityZone": "us-east-1b",
+        "VpcId": {
+          "Ref": "vpc7038fc0a"
+        }
+      }
+    },
+    "subnet71af1e2d": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "CidrBlock": "172.31.32.0/20",
+        "AvailabilityZone": "us-east-1d",
+        "VpcId": {
+          "Ref": "vpc7038fc0a"
+        }
+      }
+    },
+    "subnet0e29692e4a045f129": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "CidrBlock": "10.10.10.0/24",
+        "AvailabilityZone": "us-east-1a",
+        "VpcId": {
+          "Ref": "vpc07a008beb8f0a242a"
+        }
+      }
+    },
+    "subnet34793d7e": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "CidrBlock": "172.31.16.0/20",
+        "AvailabilityZone": "us-east-1c",
+        "VpcId": {
+          "Ref": "vpc7038fc0a"
+        }
+      }
+    },
+    "subneteacf35d4": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "CidrBlock": "172.31.64.0/20",
+        "AvailabilityZone": "us-east-1e",
+        "VpcId": {
+          "Ref": "vpc7038fc0a"
+        }
+      }
+    },
+    "subnet09b3046e": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "CidrBlock": "172.31.0.0/20",
+        "AvailabilityZone": "us-east-1a",
+        "VpcId": {
+          "Ref": "vpc7038fc0a"
+        }
+      }
+    },
+    "subnet540a7f5b": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "CidrBlock": "172.31.48.0/20",
+        "AvailabilityZone": "us-east-1f",
+        "VpcId": {
+          "Ref": "vpc7038fc0a"
+        }
+      }
+    },
+    "igw0ed758b29920b7d89": {
+      "Type": "AWS::EC2::InternetGateway",
+      "Properties": {
+      }
+    },
+    "igw1f93a567": {
+      "Type": "AWS::EC2::InternetGateway",
+      "Properties": {
+      }
+    },
+    "dopt832544f8": {
+      "Type": "AWS::EC2::DHCPOptions",
+      "Properties": {
+        "DomainName": "ec2.internal",
+        "DomainNameServers": [
+          "AmazonProvidedDNS"
+        ]
+      }
+    },
+    "acl286c4052": {
+      "Type": "AWS::EC2::NetworkAcl",
+      "Properties": {
+        "VpcId": {
+          "Ref": "vpc7038fc0a"
+        }
+      }
+    },
+    "acl09f699ddb3df55177": {
+      "Type": "AWS::EC2::NetworkAcl",
+      "Properties": {
+        "VpcId": {
+          "Ref": "vpc07a008beb8f0a242a"
+        }
+      }
+    },
+    "rtb0ffe9bb25c95439aa": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "VpcId": {
+          "Ref": "vpc07a008beb8f0a242a"
+        }
+      }
+    },
+    "rtb3c139043": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "VpcId": {
+          "Ref": "vpc7038fc0a"
+        }
+      }
+    },
+    "rtb07674ce881fd529a9": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "VpcId": {
+          "Ref": "vpc07a008beb8f0a242a"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "CloudformerVPCRouteTable"
+          }
+        ]
+      }
+    },
+    "distd34nak86sb33w9cloudfrontnet": {
+      "Type": "AWS::CloudFront::Distribution",
+      "Properties": {
+        "DistributionConfig": {
+          "Aliases": [
+            "www.goshenconsulting.ca",
+            "goshenconsulting.ca",
+            "cdn.goshenconsulting.ca"
+          ],
+          "Comment": "goshenconsulting.ca CDN",
+          "Enabled": true,
+          "DefaultRootObject": "index",
+          "PriceClass": "PriceClass_All",
+          "DefaultCacheBehavior": {
+            "TargetOriginId": "S3-goshenconsulting.ca",
+            "ViewerProtocolPolicy": "redirect-to-https",
+            "MinTTL": 0,
+            "AllowedMethods": [
+              "HEAD",
+              "GET"
+            ],
+            "CachedMethods": [
+              "HEAD",
+              "GET"
+            ],
+            "ForwardedValues": {
+              "Cookies": {
+                "Forward": "none"
+              }
+            }
+          },
+          "Logging": {
+            "Bucket": "goshenconsulting.ca.logs.s3.amazonaws.com",
+            "IncludeCookies": true,
+            "Prefix": "cdn/"
+          },
+          "Origins": [
+            {
+              "DomainName": "goshenconsulting.ca.s3.amazonaws.com",
+              "Id": "S3-goshenconsulting.ca",
+              "S3OriginConfig": {
+              }
+            }
+          ],
+          "Restrictions": {
+            "GeoRestriction": {
+              "RestrictionType": "none",
+              "Locations": [
+
+              ]
+            }
+          },
+          "ViewerCertificate": {
+            "SslSupportMethod": "sni-only",
+            "MinimumProtocolVersion": "TLSv1.1_2016"
+          }
+        }
+      }
+    },
+    "instancei0077eab76ffb8449b": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "DisableApiTermination": "false",
+        "InstanceInitiatedShutdownBehavior": "stop",
+        "ImageId": "ami-7f6aa912",
+        "InstanceType": "t2.small",
+        "Monitoring": "false"
+      }
+    },
+    "s3goshenconsultingca": {
+      "Type": "AWS::S3::Bucket",
+      "Properties": {
+        "AccessControl": "PublicRead",
+        "VersioningConfiguration": {
+          "Status": "Enabled"
+        }
+      }
+    },
+    "sgCashStakkksWebServerSecurityGroupDFBUCG7JX3TN": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "Enable HTTPS access via port 443",
+        "VpcId": {
+          "Ref": "vpc07a008beb8f0a242a"
+        }
+      }
+    },
+    "sgdefault": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "default VPC security group",
+        "VpcId": {
+          "Ref": "vpc7038fc0a"
+        }
+      }
+    },
+    "dbsgdefault": {
+      "Type": "AWS::RDS::DBSecurityGroup",
+      "Properties": {
+        "GroupDescription": "default"
+      }
+    },
+    "s3policygoshenconsultingca": {
+      "Type": "AWS::S3::BucketPolicy",
+      "Properties": {
+        "Bucket": {
+          "Ref": "s3goshenconsultingca"
+        },
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Id": "Policy1523686993118",
+          "Statement": [
+            {
+              "Sid": "Stmt1523686991389",
+              "Effect": "Allow",
+              "Principal": "*",
+              "Action": "s3:GetObject",
+              "Resource": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:aws:s3:::",
+                    "goshenconsulting",
+                    ".ca/*"
+                  ]
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+    "acl1": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": "0.0.0.0/0",
+        "Egress": "true",
+        "Protocol": "-1",
+        "RuleAction": "allow",
+        "RuleNumber": "100",
+        "NetworkAclId": {
+          "Ref": "acl286c4052"
+        }
+      }
+    },
+    "acl2": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": "0.0.0.0/0",
+        "Protocol": "-1",
+        "RuleAction": "allow",
+        "RuleNumber": "100",
+        "NetworkAclId": {
+          "Ref": "acl286c4052"
+        }
+      }
+    },
+    "acl3": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": "0.0.0.0/0",
+        "Egress": "true",
+        "Protocol": "-1",
+        "RuleAction": "allow",
+        "RuleNumber": "100",
+        "NetworkAclId": {
+          "Ref": "acl09f699ddb3df55177"
+        }
+      }
+    },
+    "acl4": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": "0.0.0.0/0",
+        "Protocol": "-1",
+        "RuleAction": "allow",
+        "RuleNumber": "100",
+        "NetworkAclId": {
+          "Ref": "acl09f699ddb3df55177"
+        }
+      }
+    },
+    "subnetacl1": {
+      "Type": "AWS::EC2::SubnetNetworkAclAssociation",
+      "Properties": {
+        "NetworkAclId": {
+          "Ref": "acl286c4052"
+        },
+        "SubnetId": {
+          "Ref": "subnet540a7f5b"
+        }
+      }
+    },
+    "subnetacl2": {
+      "Type": "AWS::EC2::SubnetNetworkAclAssociation",
+      "Properties": {
+        "NetworkAclId": {
+          "Ref": "acl286c4052"
+        },
+        "SubnetId": {
+          "Ref": "subnet09b3046e"
+        }
+      }
+    },
+    "subnetacl3": {
+      "Type": "AWS::EC2::SubnetNetworkAclAssociation",
+      "Properties": {
+        "NetworkAclId": {
+          "Ref": "acl286c4052"
+        },
+        "SubnetId": {
+          "Ref": "subnet34793d7e"
+        }
+      }
+    },
+    "subnetacl4": {
+      "Type": "AWS::EC2::SubnetNetworkAclAssociation",
+      "Properties": {
+        "NetworkAclId": {
+          "Ref": "acl286c4052"
+        },
+        "SubnetId": {
+          "Ref": "subneteacf35d4"
+        }
+      }
+    },
+    "subnetacl5": {
+      "Type": "AWS::EC2::SubnetNetworkAclAssociation",
+      "Properties": {
+        "NetworkAclId": {
+          "Ref": "acl286c4052"
+        },
+        "SubnetId": {
+          "Ref": "subnetbf6dde91"
+        }
+      }
+    },
+    "subnetacl6": {
+      "Type": "AWS::EC2::SubnetNetworkAclAssociation",
+      "Properties": {
+        "NetworkAclId": {
+          "Ref": "acl286c4052"
+        },
+        "SubnetId": {
+          "Ref": "subnet71af1e2d"
+        }
+      }
+    },
+    "subnetacl7": {
+      "Type": "AWS::EC2::SubnetNetworkAclAssociation",
+      "Properties": {
+        "NetworkAclId": {
+          "Ref": "acl09f699ddb3df55177"
+        },
+        "SubnetId": {
+          "Ref": "subnet0e29692e4a045f129"
+        }
+      }
+    },
+    "gw1": {
+      "Type": "AWS::EC2::VPCGatewayAttachment",
+      "Properties": {
+        "VpcId": {
+          "Ref": "vpc07a008beb8f0a242a"
+        },
+        "InternetGatewayId": {
+          "Ref": "igw0ed758b29920b7d89"
+        }
+      }
+    },
+    "gw2": {
+      "Type": "AWS::EC2::VPCGatewayAttachment",
+      "Properties": {
+        "VpcId": {
+          "Ref": "vpc7038fc0a"
+        },
+        "InternetGatewayId": {
+          "Ref": "igw1f93a567"
+        }
+      }
+    },
+    "subnetroute3": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "rtb07674ce881fd529a9"
+        },
+        "SubnetId": {
+          "Ref": "subnet0e29692e4a045f129"
+        }
+      }
+    },
+    "route1": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "RouteTableId": {
+          "Ref": "rtb3c139043"
+        },
+        "GatewayId": {
+          "Ref": "igw1f93a567"
+        }
+      },
+      "DependsOn": "gw2"
+    },
+    "route2": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "RouteTableId": {
+          "Ref": "rtb07674ce881fd529a9"
+        },
+        "GatewayId": {
+          "Ref": "igw0ed758b29920b7d89"
+        }
+      },
+      "DependsOn": "gw1"
+    },
+    "dchpassoc1": {
+      "Type": "AWS::EC2::VPCDHCPOptionsAssociation",
+      "Properties": {
+        "VpcId": {
+          "Ref": "vpc07a008beb8f0a242a"
+        },
+        "DhcpOptionsId": {
+          "Ref": "dopt832544f8"
+        }
+      }
+    },
+    "dchpassoc2": {
+      "Type": "AWS::EC2::VPCDHCPOptionsAssociation",
+      "Properties": {
+        "VpcId": {
+          "Ref": "vpc7038fc0a"
+        },
+        "DhcpOptionsId": {
+          "Ref": "dopt832544f8"
+        }
+      }
+    },
+    "ingress1": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgCashStakkksWebServerSecurityGroupDFBUCG7JX3TN"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "443",
+        "ToPort": "443",
+        "CidrIp": "0.0.0.0/0"
+      }
+    },
+    "ingress2": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgdefault"
+        },
+        "IpProtocol": "-1",
+        "SourceSecurityGroupId": {
+          "Ref": "sgdefault"
+        },
+        "SourceSecurityGroupOwnerId": "458534300134"
+      }
+    },
+    "ingress3": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgdefault"
+        },
+        "IpProtocol": "-1",
+        "SourceSecurityGroupId": {
+          "Ref": "sgdefault"
+        },
+        "SourceSecurityGroupOwnerId": "458534300134"
+      }
+    },
+    "egress1": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgCashStakkksWebServerSecurityGroupDFBUCG7JX3TN"
+        },
+        "IpProtocol": "-1",
+        "CidrIp": "0.0.0.0/0"
+      }
+    },
+    "egress2": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgdefault"
+        },
+        "IpProtocol": "-1",
+        "CidrIp": "0.0.0.0/0"
+      }
+    },
+    "egress3": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgdefault"
+        },
+        "IpProtocol": "-1",
+        "CidrIp": "0.0.0.0/0"
+      }
+    }
+  },
+  "Description": ""
+}
