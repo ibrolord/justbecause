@@ -1,0 +1,293 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Resources": {
+    "zonegoshenconsultingca": {
+      "Type": "AWS::Route53::HostedZone",
+      "Properties": {
+        "Name": "goshenconsulting.ca.",
+        "HostedZoneConfig": {
+          "Comment": "Charle's website"
+        }
+      }
+    },
+    "dnsgoshenconsultingca": {
+      "Type": "AWS::Route53::RecordSetGroup",
+      "Properties": {
+        "HostedZoneId": {
+          "Ref": "zonegoshenconsultingca"
+        },
+        "RecordSets": [
+          {
+            "Name": "goshenconsulting.ca.",
+            "Type": "TXT",
+            "TTL": "60",
+            "ResourceRecords": [
+              "\"zoho-verification=zb15321501.zmverify.zoho.com\""
+            ]
+          }
+        ]
+      }
+    },
+    "dnsamazonsesgoshenconsultingca": {
+      "Type": "AWS::Route53::RecordSetGroup",
+      "Properties": {
+        "HostedZoneId": {
+          "Ref": "zonegoshenconsultingca"
+        },
+        "RecordSets": [
+          {
+            "Name": "_amazonses.goshenconsulting.ca.",
+            "Type": "TXT",
+            "TTL": "1800",
+            "ResourceRecords": [
+              "\"Bi17aqdQST3J2RmLYH/RYBAoW6xeGAMk4JJyLtveHXQ=\""
+            ]
+          }
+        ]
+      }
+    },
+    "dnsdee982ee41859420c4497e8cb6b27c1cgoshenconsultingca": {
+      "Type": "AWS::Route53::RecordSetGroup",
+      "Properties": {
+        "HostedZoneId": {
+          "Ref": "zonegoshenconsultingca"
+        },
+        "RecordSets": [
+          {
+            "Name": "_dee982ee41859420c4497e8cb6b27c1c.goshenconsulting.ca.",
+            "Type": "CNAME",
+            "TTL": "300",
+            "ResourceRecords": [
+              "_3a132df74ec2fb3507af4edbbf06e315.acm-validations.aws."
+            ]
+          }
+        ]
+      }
+    },
+    "dns4es3xx4hyuk2hbpkxxzfbzdwgzu2cyfvdomainkeygoshenconsultingca": {
+      "Type": "AWS::Route53::RecordSetGroup",
+      "Properties": {
+        "HostedZoneId": {
+          "Ref": "zonegoshenconsultingca"
+        },
+        "RecordSets": [
+          {
+            "Name": "4es3xx4hyuk2hbpkxxzfbzdwgzu2cyfv._domainkey.goshenconsulting.ca.",
+            "Type": "CNAME",
+            "TTL": "1800",
+            "ResourceRecords": [
+              "4es3xx4hyuk2hbpkxxzfbzdwgzu2cyfv.dkim.amazonses.com"
+            ]
+          }
+        ]
+      }
+    },
+    "dns54e2f632jcvmlirdj5lnuk5f2oxybw3xdomainkeygoshenconsultingca": {
+      "Type": "AWS::Route53::RecordSetGroup",
+      "Properties": {
+        "HostedZoneId": {
+          "Ref": "zonegoshenconsultingca"
+        },
+        "RecordSets": [
+          {
+            "Name": "54e2f632jcvmlirdj5lnuk5f2oxybw3x._domainkey.goshenconsulting.ca.",
+            "Type": "CNAME",
+            "TTL": "1800",
+            "ResourceRecords": [
+              "54e2f632jcvmlirdj5lnuk5f2oxybw3x.dkim.amazonses.com"
+            ]
+          }
+        ]
+      }
+    },
+    "dnsn6byvnxcn2vkgzox75jso5vyosopzt45domainkeygoshenconsultingca": {
+      "Type": "AWS::Route53::RecordSetGroup",
+      "Properties": {
+        "HostedZoneId": {
+          "Ref": "zonegoshenconsultingca"
+        },
+        "RecordSets": [
+          {
+            "Name": "n6byvnxcn2vkgzox75jso5vyosopzt45._domainkey.goshenconsulting.ca.",
+            "Type": "CNAME",
+            "TTL": "1800",
+            "ResourceRecords": [
+              "n6byvnxcn2vkgzox75jso5vyosopzt45.dkim.amazonses.com"
+            ]
+          }
+        ]
+      }
+    },
+    "dnscdngoshenconsultingca": {
+      "Type": "AWS::Route53::RecordSetGroup",
+      "Properties": {
+        "HostedZoneId": {
+          "Ref": "zonegoshenconsultingca"
+        },
+        "RecordSets": [
+          {
+            "Name": "cdn.goshenconsulting.ca.",
+            "Type": "A",
+            "AliasTarget": {
+              "HostedZoneId": "Z2FDTNDATAQYW2",
+              "DNSName": "d34nak86sb33w9.cloudfront.net"
+            }
+          }
+        ]
+      }
+    },
+    "dns1f2897f2fa7b3954c689ffe258363358cdngoshenconsultingca": {
+      "Type": "AWS::Route53::RecordSetGroup",
+      "Properties": {
+        "HostedZoneId": {
+          "Ref": "zonegoshenconsultingca"
+        },
+        "RecordSets": [
+          {
+            "Name": "_1f2897f2fa7b3954c689ffe258363358.cdn.goshenconsulting.ca.",
+            "Type": "CNAME",
+            "TTL": "60",
+            "ResourceRecords": [
+              "_89e29a4e693639a84fb0d4ccd71c7925.acm-validations.aws."
+            ]
+          }
+        ]
+      }
+    },
+    "dns823159fdb384ad6774c5c179f8944c9awwwgoshenconsultingca": {
+      "Type": "AWS::Route53::RecordSetGroup",
+      "Properties": {
+        "HostedZoneId": {
+          "Ref": "zonegoshenconsultingca"
+        },
+        "RecordSets": [
+          {
+            "Name": "_823159fdb384ad6774c5c179f8944c9a.www.goshenconsulting.ca.",
+            "Type": "CNAME",
+            "TTL": "60",
+            "ResourceRecords": [
+              "_e68f418bedfb17a7cd04bb22c49795d9.acm-validations.aws."
+            ]
+          }
+        ]
+      }
+    },
+    "vpc7038fc0a": {
+      "Type": "AWS::EC2::VPC",
+      "Properties": {
+        "CidrBlock": "172.31.0.0/16",
+        "InstanceTenancy": "default",
+        "EnableDnsSupport": "true",
+        "EnableDnsHostnames": "true"
+      }
+    },
+    "distd34nak86sb33w9cloudfrontnet": {
+      "Type": "AWS::CloudFront::Distribution",
+      "Properties": {
+        "DistributionConfig": {
+          "Aliases": [
+            "www.goshenconsulting.ca",
+            "goshenconsulting.ca",
+            "cdn.goshenconsulting.ca"
+          ],
+          "Comment": "goshenconsulting.ca CDN",
+          "Enabled": true,
+          "DefaultRootObject": "index",
+          "PriceClass": "PriceClass_All",
+          "DefaultCacheBehavior": {
+            "TargetOriginId": "S3-goshenconsulting.ca",
+            "ViewerProtocolPolicy": "redirect-to-https",
+            "MinTTL": 0,
+            "AllowedMethods": [
+              "HEAD",
+              "GET"
+            ],
+            "CachedMethods": [
+              "HEAD",
+              "GET"
+            ],
+            "ForwardedValues": {
+              "Cookies": {
+                "Forward": "none"
+              }
+            }
+          },
+          "Logging": {
+            "Bucket": "goshenconsulting.ca.logs.s3.amazonaws.com",
+            "IncludeCookies": true,
+            "Prefix": "cdn/"
+          },
+          "Origins": [
+            {
+              "DomainName": "goshenconsulting.ca.s3.amazonaws.com",
+              "Id": "S3-goshenconsulting.ca",
+              "S3OriginConfig": {
+              }
+            }
+          ],
+          "Restrictions": {
+            "GeoRestriction": {
+              "RestrictionType": "none",
+              "Locations": [
+
+              ]
+            }
+          },
+          "ViewerCertificate": {
+            "SslSupportMethod": "sni-only",
+            "MinimumProtocolVersion": "TLSv1.1_2016"
+          }
+        }
+      }
+    },
+    "s3goshenconsultingca": {
+      "Type": "AWS::S3::Bucket",
+      "Properties": {
+        "AccessControl": "PublicRead",
+        "VersioningConfiguration": {
+          "Status": "Enabled"
+        }
+      }
+    },
+    "s3policygoshenconsultingca": {
+      "Type": "AWS::S3::BucketPolicy",
+      "Properties": {
+        "Bucket": {
+          "Ref": "s3goshenconsultingca"
+        },
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Id": "Policy1523686993118",
+          "Statement": [
+            {
+              "Sid": "Stmt1523686991389",
+              "Effect": "Allow",
+              "Principal": "*",
+              "Action": "s3:GetObject",
+              "Resource": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:aws:s3:::",
+                    "goshenconsulting",
+                    ".ca/*"
+                  ]
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+    "dchpassoc3": {
+      "Type": "AWS::EC2::VPCDHCPOptionsAssociation",
+      "Properties": {
+        "VpcId": {
+          "Ref": "vpc7038fc0a"
+        },
+        "DhcpOptionsId": "dopt-832544f8"
+      }
+    }
+  },
+  "Description": ""
+}
