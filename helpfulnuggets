@@ -1,0 +1,6 @@
+###Progress bar tar bzip2
+tar cf - IbroWork.vhdx -P | pv -s $[$(du -sk IbroWork.vhdx | awk '{print $1}') * 1024] | bzip2 > IbroWork.vhdx.tar.bzip2
+
+###Kube generator
+kubectl run --generator=run-pod/v1 $1 --image=$2 $3 $4 $5 $6 --dry-run -o yaml > $1.yaml
+
